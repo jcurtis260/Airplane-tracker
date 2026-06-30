@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { LocationPrompt } from '@/components/location-prompt';
 import { Button } from '@/components/ui/button';
+import { UserLocation } from '@/lib/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Plane, MapPin, Building2, Globe, Zap, Eye, Route } from 'lucide-react';
@@ -31,8 +32,8 @@ export default function Home() {
     router.push(`/tracker?lat=${city.lat}&lon=${city.lon}`);
   };
 
-  const handleLocationDetected = (location: { lat: number; lon: number }) => {
-    router.push(`/tracker?lat=${location.lat}&lon=${location.lon}`);
+  const handleLocationDetected = (location: UserLocation) => {
+    router.push(`/tracker?lat=${location.latitude}&lon=${location.longitude}`);
   };
 
   const handleLocationError = (error: string) => {

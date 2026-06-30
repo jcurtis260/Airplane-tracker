@@ -2,19 +2,22 @@ export interface Airplane {
   hex: string;
   type?: string;
   flight?: string;
-  registration?: string;
-  lat?: number;
-  lon?: number;
+  r?: string;
+  t?: string;
   alt_baro?: number;
   alt_geom?: number;
   gs?: number;
   track?: number;
   baro_rate?: number;
   squawk?: string;
+  emergency?: string;
   category?: string;
+  nav_qnh?: number;
   nav_altitude_mcp?: number;
-  nav_heading?: number;
-  seen?: number;
+  lat?: number;
+  lon?: number;
+  nic?: number;
+  rc?: number;
   seen_pos?: number;
   version?: number;
   nic_baro?: number;
@@ -27,11 +30,8 @@ export interface Airplane {
   mlat?: string[];
   tisb?: string[];
   messages?: number;
+  seen?: number;
   rssi?: number;
-  alert?: number;
-  spi?: number;
-  t?: string;
-  r?: string;
 }
 
 export interface AirplanesResponse {
@@ -42,28 +42,49 @@ export interface AirplanesResponse {
 }
 
 export interface UserLocation {
-  lat: number;
-  lon: number;
-}
-
-export interface ViewMode {
-  mode: '2d' | '3d';
+  latitude: number;
+  longitude: number;
 }
 
 export interface AirplaneWithHistory extends Airplane {
-  history?: Array<{ lat: number; lon: number; timestamp: number }>;
+  positions: Array<{
+    lat: number;
+    lon: number;
+    alt: number;
+    timestamp: number;
+  }>;
 }
 
 export interface Airport {
-  icao?: string;
+  icao: string;
   iata?: string;
-  name?: string;
-  city?: string;
-  country?: string;
+  name: string;
+  city: string;
+  country: string;
+  lat: number;
+  lon: number;
+  elevation?: number;
 }
 
 export interface FlightRoute {
   origin?: Airport;
   destination?: Airport;
-  callsign?: string;
+  airline?: {
+    name: string;
+    icao: string;
+    iata: string;
+    country: string;
+    callsign: string;
+  };
+}
+
+export interface ATCFrequency {
+  id: string;
+  name: string;
+  type: 'tower' | 'ground' | 'approach' | 'departure' | 'center' | 'atis' | 'other';
+  frequency?: string;
+  streamUrl?: string;
+  listeners?: number;
+  airport?: string;
+  icao?: string;
 }

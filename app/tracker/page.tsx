@@ -8,6 +8,7 @@ import { AirportCard } from '@/components/airport-card';
 import { AirplaneList } from '@/components/airplane-list';
 import { CacheStats } from '@/components/cache-stats';
 import { RadiusControl } from '@/components/radius-control';
+import { ATCPlayer } from '@/components/atc-player';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -24,6 +25,8 @@ function TrackerContent() {
   const [selectedAirport, setSelectedAirport] = useState<AirportData | null>(null);
   const [viewMode, setViewMode] = useState<'map' | 'list'>('map');
   const [radius, setRadius] = useState(250); // km - default 250km
+  const [showATC, setShowATC] = useState(false);
+  const [atcIcao, setAtcIcao] = useState<string | null>(null);
 
   // Initialize location from URL params or localStorage
   useEffect(() => {
@@ -31,9 +34,9 @@ function TrackerContent() {
     const lon = searchParams.get('lon');
 
     if (lat && lon) {
-      const location = {
-        lat: parseFloat(lat),
-        lon: parseFloat(lon),
+      const location: UserLocation = {
+        latitude: parseFloat(lat),
+        longitude: parseFloat(lon),
       };
       setUserLocation(location);
       localStorage.setItem('userLocation', JSON.stringify(location));
@@ -140,6 +143,8 @@ function TrackerContent() {
             onAirportClick={(airport) => {
               setSelectedAirport(airport);
               setSelectedAirplane(null);
+              setAtcIcao(airport.icao);
+              setShowATC(true);
             }}
             radius={radius}
           />
@@ -159,6 +164,14 @@ function TrackerContent() {
         <AirportCard
           airport={selectedAirport}
           onClose={() => setSelectedAirport(null)}
+        />
+      )}
+
+      {/* ATC Radio Player - shows when airport is selected */}
+      {showATC && atcIcao && viewMode === 'map' && (
+        <ATCPlayer
+          icao={atcIcao}
+          onClose={() => setShowATC(false)}
         />
       )}
 

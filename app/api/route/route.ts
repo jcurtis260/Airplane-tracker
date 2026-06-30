@@ -75,13 +75,15 @@ async function fetchFromAdsbdb(callsign: string, registration?: string): Promise
     }
 
     const route: FlightRoute = {
-      callsign,
       origin: data.response.flightroute?.origin ? {
         icao: data.response.flightroute.origin.icao_code,
         iata: data.response.flightroute.origin.iata_code,
         name: data.response.flightroute.origin.name,
         city: data.response.flightroute.origin.municipality,
         country: data.response.flightroute.origin.country_name,
+        lat: data.response.flightroute.origin.latitude,
+        lon: data.response.flightroute.origin.longitude,
+        elevation: data.response.flightroute.origin.elevation,
       } : undefined,
       destination: data.response.flightroute?.destination ? {
         icao: data.response.flightroute.destination.icao_code,
@@ -89,6 +91,9 @@ async function fetchFromAdsbdb(callsign: string, registration?: string): Promise
         name: data.response.flightroute.destination.name,
         city: data.response.flightroute.destination.municipality,
         country: data.response.flightroute.destination.country_name,
+        lat: data.response.flightroute.destination.latitude,
+        lon: data.response.flightroute.destination.longitude,
+        elevation: data.response.flightroute.destination.elevation,
       } : undefined,
     };
 
@@ -218,21 +223,24 @@ async function fetchFromHexdb(callsign: string, registration?: string): Promise<
     ]);
 
     const route: FlightRoute = {
-      callsign,
       origin: originData ? {
         icao: originData.icao,
         iata: originData.iata,
         name: originData.airport,
         city: originData.region_name,
         country: originData.country_code,
-      } : { icao: originIcao },
+        lat: originData.lat || originData.latitude || 0,
+        lon: originData.lon || originData.longitude || 0,
+      } : undefined,
       destination: destData ? {
         icao: destData.icao,
         iata: destData.iata,
         name: destData.airport,
         city: destData.region_name,
         country: destData.country_code,
-      } : { icao: destIcao },
+        lat: destData.lat || destData.latitude || 0,
+        lon: destData.lon || destData.longitude || 0,
+      } : undefined,
     };
 
     console.log(`[SERVER][HEXDB] Route constructed:`, route);

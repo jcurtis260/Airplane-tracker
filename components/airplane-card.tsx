@@ -103,8 +103,8 @@ export function AirplaneCard({ airplane, onClose }: AirplaneCardProps) {
               <span className="font-semibold text-base">{airplane.flight?.trim() || 'N/A'}</span>
             </div>
             <div className="flex justify-between items-center gap-2">
-              <span className="text-muted-foreground">Registration:</span>
-              <span className="font-medium">{airplane.r || airplane.registration || 'N/A'}</span>
+          <span className="text-muted-foreground">Registration:</span>
+          <span className="font-medium">{airplane.r || 'N/A'}</span>
             </div>
             <div className="flex justify-between items-center gap-2">
               <span className="text-muted-foreground">ICAO Hex:</span>

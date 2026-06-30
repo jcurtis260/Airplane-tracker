@@ -18,7 +18,7 @@ export function useAirplanes(location: UserLocation | null, radius: number = 100
   const shouldFetch = location !== null;
   
   const url = shouldFetch
-    ? `/api/airplanes?lat=${location.lat}&lon=${location.lon}&radius=${radius}`
+    ? `/api/airplanes?lat=${location.latitude}&lon=${location.longitude}&radius=${radius}`
     : null;
 
   const { data, error, isLoading, mutate } = useSWR<AirplanesResponse>(

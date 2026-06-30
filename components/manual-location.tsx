@@ -39,7 +39,7 @@ export function ManualLocation({ onLocationSet }: ManualLocationProps) {
       return;
     }
 
-    const location: UserLocation = { lat: latitude, lon: longitude };
+    const location: UserLocation = { latitude, longitude };
     localStorage.setItem('userLocation', JSON.stringify(location));
     onLocationSet(location);
   };

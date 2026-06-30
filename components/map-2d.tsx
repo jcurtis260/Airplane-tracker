@@ -34,8 +34,8 @@ export function Map2D({
 
   // Get airports in range
   const nearbyAirports = useMemo(() => {
-    return getAirportsInRange(userLocation.lat, userLocation.lon, radius * 2); // Show airports in 2x radius
-  }, [userLocation.lat, userLocation.lon, radius]);
+    return getAirportsInRange(userLocation.latitude, userLocation.longitude, radius * 2); // Show airports in 2x radius
+  }, [userLocation.latitude, userLocation.longitude, radius]);
 
   // Create GeoJSON for the radius circle
   const radiusCircle = {
@@ -43,7 +43,7 @@ export function Map2D({
     properties: {},
     geometry: {
       type: 'Point' as const,
-      coordinates: [userLocation.lon, userLocation.lat],
+      coordinates: [userLocation.longitude, userLocation.latitude],
     },
   };
 
@@ -59,8 +59,8 @@ export function Map2D({
     <Map
       ref={mapRef}
       initialViewState={{
-        latitude: userLocation.lat,
-        longitude: userLocation.lon,
+        latitude: userLocation.latitude,
+        longitude: userLocation.longitude,
         zoom: 9,
       }}
       style={{ width: '100%', height: '100%' }}
@@ -84,8 +84,8 @@ export function Map2D({
 
       {/* User location marker */}
       <Marker
-        latitude={userLocation.lat}
-        longitude={userLocation.lon}
+        latitude={userLocation.latitude}
+        longitude={userLocation.longitude}
         anchor="center"
       >
         <div className="relative flex items-center justify-center">

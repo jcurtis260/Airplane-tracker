@@ -24,8 +24,8 @@ export function LocationPrompt({ onLocationDetected, onError }: LocationPromptPr
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const location: UserLocation = {
-          lat: position.coords.latitude,
-          lon: position.coords.longitude,
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
         };
         
         // Save to localStorage for persistence
