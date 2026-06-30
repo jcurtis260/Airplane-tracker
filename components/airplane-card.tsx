@@ -15,7 +15,7 @@ import {
   getAirplaneRoute,
 } from '@/lib/airplane-api';
 import { formatAirport } from '@/lib/route-api';
-import { X, Plane, MapPin, Loader2 } from 'lucide-react';
+import { X, Plane, MapPin, Loader2, PlaneTakeoff, PlaneLanding } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 interface AirplaneCardProps {
@@ -102,26 +102,30 @@ export function AirplaneCard({ airplane, onClose }: AirplaneCardProps) {
             ) : route?.origin || route?.destination ? (
               <div className="space-y-2 text-sm">
                 {route.origin && (
-                  <div className="flex flex-col gap-1">
-                    <span className="text-xs text-muted-foreground uppercase tracking-wide">From</span>
-                    <span className="font-semibold text-base" title={formatAirport(route.origin)}>
-                      {formatAirport(route.origin)}
-                    </span>
+                  <div className="flex items-start gap-2">
+                    <PlaneTakeoff className="h-4 w-4 mt-1 text-green-600 dark:text-green-400 flex-shrink-0" />
+                    <div className="flex flex-col gap-1">
+                      <span className="text-xs text-muted-foreground uppercase tracking-wide">Departure</span>
+                      <span className="font-semibold text-base" title={formatAirport(route.origin)}>
+                        {formatAirport(route.origin)}
+                      </span>
+                    </div>
                   </div>
                 )}
                 {route.origin && route.destination && (
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <div className="flex-1 border-t border-dashed" />
-                    <span className="text-xs">✈</span>
+                  <div className="flex items-center gap-2 text-muted-foreground pl-6">
                     <div className="flex-1 border-t border-dashed" />
                   </div>
                 )}
                 {route.destination && (
-                  <div className="flex flex-col gap-1">
-                    <span className="text-xs text-muted-foreground uppercase tracking-wide">To</span>
-                    <span className="font-semibold text-base" title={formatAirport(route.destination)}>
-                      {formatAirport(route.destination)}
-                    </span>
+                  <div className="flex items-start gap-2">
+                    <PlaneLanding className="h-4 w-4 mt-1 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+                    <div className="flex flex-col gap-1">
+                      <span className="text-xs text-muted-foreground uppercase tracking-wide">Arrival</span>
+                      <span className="font-semibold text-base" title={formatAirport(route.destination)}>
+                        {formatAirport(route.destination)}
+                      </span>
+                    </div>
                   </div>
                 )}
               </div>
