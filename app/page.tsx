@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { LocationPrompt } from '@/components/location-prompt';
 import { ManualLocation } from '@/components/manual-location';
 import { UserLocation } from '@/lib/types';
-import { Plane, Globe, Eye, Zap } from 'lucide-react';
+import { Plane, Globe, Zap } from 'lucide-react';
 
 export default function Home() {
   const router = useRouter();
@@ -36,8 +36,8 @@ export default function Home() {
           </h1>
           
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
-            Track airplanes flying overhead in real-time. View detailed flight information, 
-            see aircraft on an interactive map, and switch between 2D and 3D views.
+            Track airplanes flying overhead in real-time. View detailed flight information 
+            including routes, altitude, speed, and more on an interactive map.
           </p>
 
           {/* Features */}
@@ -51,10 +51,10 @@ export default function Home() {
             </div>
             
             <div className="p-6 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-lg border">
-              <Eye className="h-8 w-8 mx-auto mb-3 text-purple-600 dark:text-purple-400" />
-              <h3 className="font-semibold mb-2">2D & 3D Views</h3>
+              <Plane className="h-8 w-8 mx-auto mb-3 text-purple-600 dark:text-purple-400" />
+              <h3 className="font-semibold mb-2">Flight Routes</h3>
               <p className="text-sm text-muted-foreground">
-                Toggle between flat map and immersive 3D visualization
+                See origin and destination airports for each flight
               </p>
             </div>
             
@@ -62,7 +62,7 @@ export default function Home() {
               <Zap className="h-8 w-8 mx-auto mb-3 text-orange-600 dark:text-orange-400" />
               <h3 className="font-semibold mb-2">Detailed Info</h3>
               <p className="text-sm text-muted-foreground">
-                View speed, altitude, heading, aircraft type, and more
+                View speed, altitude, heading, aircraft type, and routes
               </p>
             </div>
           </div>

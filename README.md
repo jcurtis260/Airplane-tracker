@@ -10,8 +10,8 @@ A real-time airplane tracking application that uses your GPS location to display
 ## Features
 
 - 🌍 **Real-Time Tracking**: Live airplane data updated every 30 seconds
-- 🗺️ **2D & 3D Views**: Toggle between flat map and immersive 3D visualization
-- ✈️ **Detailed Information**: View callsign, altitude, speed, heading, aircraft type, and more
+- ✈️ **Flight Routes**: View origin and destination airports for each flight
+- 📊 **Detailed Information**: View callsign, altitude, speed, heading, aircraft type, and more
 - 📍 **Location-Based**: Automatically detects your location or allows manual input
 - 🎨 **Altitude Color Coding**: Visual distinction between low, medium, and high-altitude aircraft
 - 🌙 **Dark Mode**: Automatic system preference detection
@@ -23,10 +23,10 @@ A real-time airplane tracking application that uses your GPS location to display
 - **Language**: [TypeScript](https://www.typescriptlang.org/)
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/)
 - **UI Components**: [shadcn/ui](https://ui.shadcn.com/)
-- **2D Maps**: [MapLibre GL JS](https://maplibre.org/)
-- **3D Visualization**: [Deck.gl](https://deck.gl/)
+- **Maps**: [MapLibre GL JS](https://maplibre.org/)
 - **Data Fetching**: [SWR](https://swr.vercel.app/)
 - **Flight Data**: [airplanes.live API](https://airplanes.live/)
+- **Route Data**: [hexdb.io API](https://hexdb.io/)
 
 ## Getting Started
 
@@ -59,9 +59,8 @@ npm run dev
 
 1. **Grant Location Permission**: Click "Find Airplanes Near Me" and allow location access
 2. **Or Enter Manually**: Input your coordinates or select a popular location
-3. **View Airplanes**: See all nearby aircraft within 100km radius
-4. **Toggle View**: Switch between 2D and 3D modes using the button
-5. **Get Details**: Click any airplane marker to view detailed flight information
+3. **View Airplanes**: See all nearby aircraft within 100km radius on an interactive map
+4. **Get Details**: Click any airplane marker to view detailed flight information including routes
 
 ## Deployment
 

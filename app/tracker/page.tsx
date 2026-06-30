@@ -3,9 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Map2D } from '@/components/map-2d';
-import { Map3D } from '@/components/map-3d';
 import { AirplaneCard } from '@/components/airplane-card';
-import { ViewToggle } from '@/components/view-toggle';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAirplanes } from '@/lib/airplane-api';
@@ -16,7 +14,6 @@ function TrackerContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
-  const [viewMode, setViewMode] = useState<'2d' | '3d'>('2d');
   const [selectedAirplane, setSelectedAirplane] = useState<Airplane | null>(null);
   const [radius] = useState(100); // km
 
@@ -84,27 +81,14 @@ function TrackerContent() {
     <div className="relative w-screen h-screen overflow-hidden">
       {/* Map */}
       <div className="absolute inset-0">
-        {viewMode === '2d' ? (
-          <Map2D
-            userLocation={userLocation}
-            airplanes={airplanes}
-            selectedAirplane={selectedAirplane}
-            onAirplaneClick={setSelectedAirplane}
-            radius={radius}
-          />
-        ) : (
-          <Map3D
-            userLocation={userLocation}
-            airplanes={airplanes}
-            selectedAirplane={selectedAirplane}
-            onAirplaneClick={setSelectedAirplane}
-            radius={radius}
-          />
-        )}
+        <Map2D
+          userLocation={userLocation}
+          airplanes={airplanes}
+          selectedAirplane={selectedAirplane}
+          onAirplaneClick={setSelectedAirplane}
+          radius={radius}
+        />
       </div>
-
-      {/* View Toggle */}
-      <ViewToggle onChange={setViewMode} />
 
       {/* Airplane Count Badge */}
       <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10">
