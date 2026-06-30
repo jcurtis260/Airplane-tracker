@@ -1,9 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { FlightRoute } from '@/lib/types';
 
-// In-memory cache for route lookups
-const routeCache = new Map<string, { route: FlightRoute | null; timestamp: number }>();
-const CACHE_TTL = 3600000; // 1 hour
+// Enhanced in-memory cache for route lookups with statistics
+const routeCache = new Map<string, { route: FlightRoute | null; timestamp: number; hits: number }>();
+const CACHE_TTL = 86400000; // 24 hours (routes don't change often)
+const NEGATIVE_CACHE_TTL = 3600000; // 1 hour for failed lookups (retry sooner)
+
+// Cache statistics for monitoring
+let cacheStats = {
+  hits: 0,
+  misses: 0,
+  writes: 0,
+  size: 0,
+};
 
 /**
  * Fetch flight route from adsbdb.com (primary source)
@@ -252,12 +261,36 @@ export async function GET(request: NextRequest) {
     const cleanRegistration = registration?.trim().toUpperCase().replace(/\s+/g, '');
     console.log(`[SERVER][ROUTE] ===== Request for: ${cleanCallsign}${cleanRegistration ? ` (reg: ${cleanRegistration})` : ''} =====`);
 
-    // Check cache
+    // Check cache with appropriate TTL
     const cached = routeCache.get(cleanCallsign);
-    if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-      console.log(`[SERVER][ROUTE] Using cached route for: ${cleanCallsign}`, cached.route ? 'HAS DATA' : 'NULL');
-      return NextResponse.json(cached.route);
+    if (cached) {
+      const ttl = cached.route ? CACHE_TTL : NEGATIVE_CACHE_TTL;
+      const age = Date.now() - cached.timestamp;
+      
+      if (age < ttl) {
+        // Cache hit!
+        cached.hits = (cached.hits || 0) + 1;
+        cacheStats.hits++;
+        cacheStats.size = routeCache.size;
+        
+        console.log(`[SERVER][ROUTE] 💾 CACHE HIT for: ${cleanCallsign} (age: ${Math.round(age/1000)}s, hits: ${cached.hits})`);
+        
+        return NextResponse.json(cached.route, {
+          headers: {
+            'Cache-Control': 'public, s-maxage=86400, stale-while-revalidate=604800',
+            'X-Cache-Status': 'HIT',
+            'X-Cache-Age': Math.round(age / 1000).toString(),
+            'X-Cache-Hits': cached.hits.toString(),
+          },
+        });
+      } else {
+        console.log(`[SERVER][ROUTE] Cache expired for: ${cleanCallsign} (age: ${Math.round(age/1000)}s)`);
+        routeCache.delete(cleanCallsign);
+      }
     }
+    
+    cacheStats.misses++;
+    console.log(`[SERVER][ROUTE] ❌ CACHE MISS for: ${cleanCallsign}`);
 
     // Try adsbdb.com first (primary source) - with registration fallback
     console.log(`[SERVER][ROUTE] Trying ADSBDB for: ${cleanCallsign}`);
@@ -274,18 +307,28 @@ export async function GET(request: NextRequest) {
     // Cache the result (even if null) to avoid repeated failed lookups
     routeCache.set(cleanCallsign, { 
       route: route || null, 
-      timestamp: Date.now() 
+      timestamp: Date.now(),
+      hits: 0,
     });
+    cacheStats.writes++;
+    cacheStats.size = routeCache.size;
 
     if (route) {
       console.log(`[SERVER][ROUTE] ✓ SUCCESS for ${cleanCallsign}: ${route.origin?.icao || '?'} -> ${route.destination?.icao || '?'}`);
     } else {
       console.log(`[SERVER][ROUTE] ✗ FAILED for ${cleanCallsign}: No route data found from any source`);
     }
+    
+    console.log(`[SERVER][ROUTE] 📊 Cache stats: ${cacheStats.hits} hits, ${cacheStats.misses} misses, ${cacheStats.size} entries (${Math.round(cacheStats.hits/(cacheStats.hits + cacheStats.misses)*100)}% hit rate)`);
 
     return NextResponse.json(route, {
       headers: {
-        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
+        // Cache successful route lookups for 24 hours, failed lookups for 1 hour
+        'Cache-Control': route 
+          ? 'public, s-maxage=86400, stale-while-revalidate=604800' 
+          : 'public, s-maxage=3600, stale-while-revalidate=86400',
+        'X-Cache-Status': 'MISS',
+        'X-Cache-Size': cacheStats.size.toString(),
       },
     });
   } catch (error) {
