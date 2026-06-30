@@ -38,19 +38,19 @@ async function fetchFromAdsbdb(callsign: string): Promise<FlightRoute | null> {
 
     const route: FlightRoute = {
       callsign,
-      origin: data.response.route?.origin ? {
-        icao: data.response.route.origin.icao_code,
-        iata: data.response.route.origin.iata_code,
-        name: data.response.route.origin.name,
-        city: data.response.route.origin.municipality,
-        country: data.response.route.origin.country_name,
+      origin: data.response.flightroute?.origin ? {
+        icao: data.response.flightroute.origin.icao_code,
+        iata: data.response.flightroute.origin.iata_code,
+        name: data.response.flightroute.origin.name,
+        city: data.response.flightroute.origin.municipality,
+        country: data.response.flightroute.origin.country_name,
       } : undefined,
-      destination: data.response.route?.destination ? {
-        icao: data.response.route.destination.icao_code,
-        iata: data.response.route.destination.iata_code,
-        name: data.response.route.destination.name,
-        city: data.response.route.destination.municipality,
-        country: data.response.route.destination.country_name,
+      destination: data.response.flightroute?.destination ? {
+        icao: data.response.flightroute.destination.icao_code,
+        iata: data.response.flightroute.destination.iata_code,
+        name: data.response.flightroute.destination.name,
+        city: data.response.flightroute.destination.municipality,
+        country: data.response.flightroute.destination.country_name,
       } : undefined,
     };
 
