@@ -92,7 +92,7 @@ export function Map2D({
         </div>
       </Marker>
 
-      {/* Airport markers */}
+      {/* Airport markers - always visible */}
       {nearbyAirports.map((airport) => (
         <Marker
           key={airport.icao}
@@ -100,12 +100,12 @@ export function Map2D({
           longitude={airport.lon}
           anchor="center"
         >
-          <div className="relative group">
-            <div className="w-3 h-3 bg-purple-500 rounded-full border border-white shadow-md opacity-60 group-hover:opacity-100 transition-opacity" />
-            <MapPin className="absolute -top-4 -left-2 w-4 h-4 text-purple-400 opacity-0 group-hover:opacity-100 transition-opacity" />
-            <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20">
-              <div className="font-semibold">{airport.iata}</div>
-              <div className="text-[10px]">{airport.name}</div>
+          <div className="relative group cursor-pointer z-[5]">
+            <div className="w-4 h-4 bg-purple-600 rounded-full border-2 border-white shadow-lg hover:scale-125 transition-transform" />
+            <div className="absolute top-5 left-1/2 -translate-x-1/2 bg-purple-900/95 text-white text-xs px-2 py-1.5 rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-[50] shadow-xl border border-purple-400">
+              <div className="font-bold text-sm">{airport.iata}</div>
+              <div className="text-[10px] text-purple-200">{airport.name}</div>
+              <div className="text-[9px] text-purple-300">{airport.city}, {airport.country}</div>
             </div>
           </div>
         </Marker>

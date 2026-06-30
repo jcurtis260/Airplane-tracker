@@ -26,18 +26,64 @@ export const MAJOR_AIRPORTS: AirportData[] = [
   { icao: 'CYVR', iata: 'YVR', name: 'Vancouver Intl', city: 'Vancouver', country: 'CA', lat: 49.1947, lon: -123.1839 },
   { icao: 'MMMX', iata: 'MEX', name: 'Mexico City Intl', city: 'Mexico City', country: 'MX', lat: 19.4363, lon: -99.0721 },
   
-  // Europe
+  // Europe - UK & Ireland
   { icao: 'EGLL', iata: 'LHR', name: 'London Heathrow', city: 'London', country: 'GB', lat: 51.4700, lon: -0.4543 },
+  { icao: 'EGKK', iata: 'LGW', name: 'London Gatwick', city: 'London', country: 'GB', lat: 51.1481, lon: -0.1903 },
+  { icao: 'EGSS', iata: 'STN', name: 'London Stansted', city: 'London', country: 'GB', lat: 51.8850, lon: 0.2350 },
+  { icao: 'EGCC', iata: 'MAN', name: 'Manchester', city: 'Manchester', country: 'GB', lat: 53.3537, lon: -2.2750 },
+  { icao: 'EIDW', iata: 'DUB', name: 'Dublin', city: 'Dublin', country: 'IE', lat: 53.4213, lon: -6.2701 },
+  
+  // Europe - Western Europe
   { icao: 'LFPG', iata: 'CDG', name: 'Paris Charles de Gaulle', city: 'Paris', country: 'FR', lat: 49.0097, lon: 2.5479 },
-  { icao: 'EDDF', iata: 'FRA', name: 'Frankfurt', city: 'Frankfurt', country: 'DE', lat: 50.0379, lon: 8.5622 },
+  { icao: 'LFPO', iata: 'ORY', name: 'Paris Orly', city: 'Paris', country: 'FR', lat: 48.7233, lon: 2.3794 },
   { icao: 'EHAM', iata: 'AMS', name: 'Amsterdam Schiphol', city: 'Amsterdam', country: 'NL', lat: 52.3086, lon: 4.7639 },
-  { icao: 'LEMD', iata: 'MAD', name: 'Madrid Barajas', city: 'Madrid', country: 'ES', lat: 40.4839, lon: -3.5680 },
-  { icao: 'LIRF', iata: 'FCO', name: 'Rome Fiumicino', city: 'Rome', country: 'IT', lat: 41.8003, lon: 12.2389 },
+  { icao: 'EBBR', iata: 'BRU', name: 'Brussels', city: 'Brussels', country: 'BE', lat: 50.9014, lon: 4.4844 },
+  { icao: 'ELLX', iata: 'LUX', name: 'Luxembourg', city: 'Luxembourg', country: 'LU', lat: 49.6233, lon: 6.2044 },
+  
+  // Europe - Germany
+  { icao: 'EDDF', iata: 'FRA', name: 'Frankfurt', city: 'Frankfurt', country: 'DE', lat: 50.0379, lon: 8.5622 },
   { icao: 'EDDM', iata: 'MUC', name: 'Munich', city: 'Munich', country: 'DE', lat: 48.3538, lon: 11.7861 },
+  { icao: 'EDDB', iata: 'BER', name: 'Berlin Brandenburg', city: 'Berlin', country: 'DE', lat: 52.3667, lon: 13.5033 },
+  { icao: 'EDDH', iata: 'HAM', name: 'Hamburg', city: 'Hamburg', country: 'DE', lat: 53.6304, lon: 9.9882 },
+  
+  // Europe - Spain & Portugal
+  { icao: 'LEMD', iata: 'MAD', name: 'Madrid Barajas', city: 'Madrid', country: 'ES', lat: 40.4839, lon: -3.5680 },
+  { icao: 'LEBL', iata: 'BCN', name: 'Barcelona El Prat', city: 'Barcelona', country: 'ES', lat: 41.2971, lon: 2.0785 },
+  { icao: 'LEMG', iata: 'AGP', name: 'Málaga Costa del Sol', city: 'Málaga', country: 'ES', lat: 36.6749, lon: -4.4991 },
+  { icao: 'LEZL', iata: 'SVQ', name: 'Sevilla', city: 'Seville', country: 'ES', lat: 37.4180, lon: -5.8931 },
+  { icao: 'LEVC', iata: 'VLC', name: 'Valencia', city: 'Valencia', country: 'ES', lat: 39.4893, lon: -0.4817 },
+  { icao: 'LEAL', iata: 'ALC', name: 'Alicante', city: 'Alicante', country: 'ES', lat: 38.2822, lon: -0.5581 },
+  { icao: 'LPPT', iata: 'LIS', name: 'Lisbon Portela', city: 'Lisbon', country: 'PT', lat: 38.7813, lon: -9.1359 },
+  { icao: 'LPPR', iata: 'OPO', name: 'Porto', city: 'Porto', country: 'PT', lat: 41.2481, lon: -8.6814 },
+  { icao: 'LPFR', iata: 'FAO', name: 'Faro', city: 'Faro', country: 'PT', lat: 37.0144, lon: -7.9659 },
+  { icao: 'LXGB', iata: 'GIB', name: 'Gibraltar', city: 'Gibraltar', country: 'GI', lat: 36.1512, lon: -5.3497 },
+  
+  // Europe - Italy
+  { icao: 'LIRF', iata: 'FCO', name: 'Rome Fiumicino', city: 'Rome', country: 'IT', lat: 41.8003, lon: 12.2389 },
+  { icao: 'LIMC', iata: 'MXP', name: 'Milan Malpensa', city: 'Milan', country: 'IT', lat: 45.6306, lon: 8.7281 },
+  { icao: 'LIPZ', iata: 'VCE', name: 'Venice Marco Polo', city: 'Venice', country: 'IT', lat: 45.5053, lon: 12.3519 },
+  
+  // Europe - Austria & Switzerland
   { icao: 'LOWW', iata: 'VIE', name: 'Vienna Intl', city: 'Vienna', country: 'AT', lat: 48.1103, lon: 16.5697 },
   { icao: 'LSZH', iata: 'ZRH', name: 'Zurich', city: 'Zurich', country: 'CH', lat: 47.4647, lon: 8.5492 },
+  { icao: 'LSGG', iata: 'GVA', name: 'Geneva', city: 'Geneva', country: 'CH', lat: 46.2381, lon: 6.1090 },
+  
+  // Europe - Eastern Europe
   { icao: 'UUEE', iata: 'SVO', name: 'Moscow Sheremetyevo', city: 'Moscow', country: 'RU', lat: 55.9726, lon: 37.4146 },
+  { icao: 'EPWA', iata: 'WAW', name: 'Warsaw Chopin', city: 'Warsaw', country: 'PL', lat: 52.1657, lon: 20.9671 },
+  { icao: 'LKPR', iata: 'PRG', name: 'Prague Václav Havel', city: 'Prague', country: 'CZ', lat: 50.1008, lon: 14.2600 },
+  { icao: 'LHBP', iata: 'BUD', name: 'Budapest Ferenc Liszt', city: 'Budapest', country: 'HU', lat: 47.4297, lon: 19.2611 },
+  
+  // Europe - Nordic
+  { icao: 'ESSA', iata: 'ARN', name: 'Stockholm Arlanda', city: 'Stockholm', country: 'SE', lat: 59.6519, lon: 17.9186 },
+  { icao: 'EKCH', iata: 'CPH', name: 'Copenhagen', city: 'Copenhagen', country: 'DK', lat: 55.6180, lon: 12.6506 },
+  { icao: 'ENGM', iata: 'OSL', name: 'Oslo Gardermoen', city: 'Oslo', country: 'NO', lat: 60.1939, lon: 11.1004 },
+  { icao: 'EFHK', iata: 'HEL', name: 'Helsinki Vantaa', city: 'Helsinki', country: 'FI', lat: 60.3172, lon: 24.9633 },
+  
+  // Europe - Turkey & Greece
   { icao: 'LTFM', iata: 'IST', name: 'Istanbul Airport', city: 'Istanbul', country: 'TR', lat: 41.2753, lon: 28.7519 },
+  { icao: 'LTBA', iata: 'IST', name: 'Istanbul Atatürk', city: 'Istanbul', country: 'TR', lat: 40.9769, lon: 28.8146 },
+  { icao: 'LGAV', iata: 'ATH', name: 'Athens Intl', city: 'Athens', country: 'GR', lat: 37.9364, lon: 23.9445 },
   
   // Asia
   { icao: 'RJTT', iata: 'HND', name: 'Tokyo Haneda', city: 'Tokyo', country: 'JP', lat: 35.5494, lon: 139.7798 },

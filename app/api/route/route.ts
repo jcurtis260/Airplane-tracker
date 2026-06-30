@@ -189,31 +189,38 @@ export async function GET(request: NextRequest) {
     }
 
     const cleanCallsign = callsign.trim().toUpperCase();
-    console.log(`[SERVER][ROUTE] Request for: ${cleanCallsign}`);
+    console.log(`[SERVER][ROUTE] ===== Request for: ${cleanCallsign} =====`);
 
     // Check cache
     const cached = routeCache.get(cleanCallsign);
     if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-      console.log(`[SERVER][ROUTE] Using cached route for: ${cleanCallsign}`);
+      console.log(`[SERVER][ROUTE] Using cached route for: ${cleanCallsign}`, cached.route ? 'HAS DATA' : 'NULL');
       return NextResponse.json(cached.route);
     }
 
     // Try adsbdb.com first (primary source)
+    console.log(`[SERVER][ROUTE] Trying ADSBDB for: ${cleanCallsign}`);
     let route = await fetchFromAdsbdb(cleanCallsign);
     
     // Fallback to hexdb.io if adsbdb has no data
     if (!route) {
-      console.log(`[SERVER][ROUTE] ADSBDB had no data, trying HEXDB...`);
+      console.log(`[SERVER][ROUTE] ADSBDB returned null, trying HEXDB...`);
       route = await fetchFromHexdb(cleanCallsign);
+    } else {
+      console.log(`[SERVER][ROUTE] ADSBDB succeeded for: ${cleanCallsign}`);
     }
 
-    // Cache the result (even if null)
+    // Cache the result (even if null) to avoid repeated failed lookups
     routeCache.set(cleanCallsign, { 
       route: route || null, 
       timestamp: Date.now() 
     });
 
-    console.log(`[SERVER][ROUTE] Final route for ${cleanCallsign}:`, route);
+    if (route) {
+      console.log(`[SERVER][ROUTE] ✓ SUCCESS for ${cleanCallsign}: ${route.origin?.icao || '?'} -> ${route.destination?.icao || '?'}`);
+    } else {
+      console.log(`[SERVER][ROUTE] ✗ FAILED for ${cleanCallsign}: No route data found from any source`);
+    }
 
     return NextResponse.json(route, {
       headers: {
