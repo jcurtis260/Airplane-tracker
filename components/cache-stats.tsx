@@ -25,16 +25,16 @@ export function CacheStats() {
     return (
       <button
         onClick={() => setShow(true)}
-        className="absolute bottom-4 right-4 z-10 p-2 bg-secondary/80 backdrop-blur-sm rounded-full shadow-lg hover:bg-secondary transition-colors"
+        className="p-3 sm:p-2 bg-secondary/80 backdrop-blur-sm rounded-full shadow-lg hover:bg-secondary transition-colors touch-manipulation"
         title="Show cache stats"
       >
-        <Database className="h-4 w-4" />
+        <Database className="h-5 w-5 sm:h-4 sm:w-4" />
       </button>
     );
   }
 
   return (
-    <div className="absolute bottom-4 right-4 z-10 bg-background/95 backdrop-blur-sm border rounded-lg shadow-xl p-3 min-w-[200px]">
+    <div className="bg-background/95 backdrop-blur-sm border rounded-lg shadow-xl p-3 w-[calc(100vw-2rem)] sm:w-auto sm:min-w-[200px] max-w-[250px]">
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           <Database className="h-4 w-4" />

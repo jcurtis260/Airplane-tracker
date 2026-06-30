@@ -23,7 +23,7 @@ function TrackerContent() {
   const [selectedAirplane, setSelectedAirplane] = useState<Airplane | null>(null);
   const [selectedAirport, setSelectedAirport] = useState<AirportData | null>(null);
   const [viewMode, setViewMode] = useState<'map' | 'list'>('map');
-  const [radius, setRadius] = useState(100); // km - default 100km
+  const [radius, setRadius] = useState(250); // km - default 250km
 
   // Initialize location from URL params or localStorage
   useEffect(() => {
@@ -87,41 +87,38 @@ function TrackerContent() {
 
   return (
     <div className="relative w-screen h-screen overflow-hidden">
-      {/* View Toggle and Count */}
-      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2">
-        <Badge variant="secondary" className="px-4 py-2 text-base shadow-lg">
-          <Plane className="h-4 w-4 mr-2" />
-          {isLoading ? (
-            'Loading...'
-          ) : (
-            <>
-              {total} airplane{total !== 1 ? 's' : ''} nearby
-            </>
-          )}
+      {/* View Toggle and Count - Mobile Optimized */}
+      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 flex flex-col sm:flex-row items-center gap-2">
+        <Badge variant="secondary" className="px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base shadow-lg">
+          <Plane className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
+          <span className="hidden sm:inline">{isLoading ? 'Loading...' : `${total} airplane${total !== 1 ? 's' : ''} nearby`}</span>
+          <span className="sm:hidden">{isLoading ? '...' : total}</span>
         </Badge>
         
         <Button
           variant="secondary"
           size="sm"
-          className="shadow-lg"
+          className="shadow-lg h-8 sm:h-9 px-3 sm:px-4 text-sm"
           onClick={() => setViewMode(viewMode === 'map' ? 'list' : 'map')}
         >
           {viewMode === 'map' ? (
             <>
-              <List className="h-4 w-4 mr-2" />
-              List
+              <List className="h-4 w-4 sm:mr-2" />
+              <span className="hidden sm:inline">List</span>
             </>
           ) : (
             <>
-              <Map className="h-4 w-4 mr-2" />
-              Map
+              <Map className="h-4 w-4 sm:mr-2" />
+              <span className="hidden sm:inline">Map</span>
             </>
           )}
         </Button>
       </div>
 
-      {/* Radius Control */}
-      <RadiusControl radius={radius} onRadiusChange={setRadius} />
+      {/* Radius Control - Mobile Optimized */}
+      <div className="absolute bottom-20 sm:bottom-4 right-4 z-10">
+        <RadiusControl radius={radius} onRadiusChange={setRadius} />
+      </div>
 
       {/* Map or List View */}
       {viewMode === 'map' ? (
@@ -196,6 +193,11 @@ function TrackerContent() {
           </div>
         </div>
       )}
+
+      {/* Cache Statistics - Mobile Optimized */}
+      <div className="absolute bottom-4 left-4 z-10">
+        <CacheStats />
+      </div>
     </div>
   );
 }
