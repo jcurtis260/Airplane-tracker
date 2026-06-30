@@ -4,8 +4,8 @@ import { useEffect, useRef, useState, useMemo } from 'react';
 import Map, { Marker, Source, Layer, MapRef } from 'react-map-gl/maplibre';
 import { Airplane, UserLocation } from '@/lib/types';
 import { getAltitudeColor } from '@/lib/airplane-api';
-import { getAirportsInRange } from '@/lib/airports';
-import { Plane, MapPin } from 'lucide-react';
+import { getAirportsInRange, AirportData } from '@/lib/airports';
+import { Plane, Building2 } from 'lucide-react';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
 interface Map2DProps {
@@ -13,6 +13,7 @@ interface Map2DProps {
   airplanes: Airplane[];
   selectedAirplane: Airplane | null;
   onAirplaneClick: (airplane: Airplane) => void;
+  onAirportClick: (airport: AirportData) => void;
   radius: number;
 }
 
@@ -21,6 +22,7 @@ export function Map2D({
   airplanes,
   selectedAirplane,
   onAirplaneClick,
+  onAirportClick,
   radius,
 }: Map2DProps) {
   const mapRef = useRef<MapRef>(null);
@@ -99,15 +101,30 @@ export function Map2D({
           latitude={airport.lat}
           longitude={airport.lon}
           anchor="center"
+          onClick={(e) => {
+            e.originalEvent.stopPropagation();
+            onAirportClick(airport);
+          }}
         >
-          <div className="relative group cursor-pointer z-[5]">
-            <div className="w-4 h-4 bg-purple-600 rounded-full border-2 border-white shadow-lg hover:scale-125 transition-transform" />
-            <div className="absolute top-5 left-1/2 -translate-x-1/2 bg-purple-900/95 text-white text-xs px-2 py-1.5 rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-[50] shadow-xl border border-purple-400">
+          <button
+            className="relative group cursor-pointer z-[5] hover:scale-110 transition-transform"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="relative">
+              <Building2 
+                className="w-5 h-5 text-purple-600 dark:text-purple-400" 
+                fill="currentColor"
+                strokeWidth={1.5}
+              />
+              <div className="absolute -inset-1 bg-white/90 dark:bg-black/90 rounded-full -z-10" />
+            </div>
+            <div className="absolute top-7 left-1/2 -translate-x-1/2 bg-purple-900/95 text-white text-xs px-2 py-1.5 rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-[50] shadow-xl border border-purple-400">
               <div className="font-bold text-sm">{airport.iata}</div>
               <div className="text-[10px] text-purple-200">{airport.name}</div>
               <div className="text-[9px] text-purple-300">{airport.city}, {airport.country}</div>
+              <div className="text-[9px] text-purple-400 mt-0.5">Click for details</div>
             </div>
-          </div>
+          </button>
         </Marker>
       ))}
 

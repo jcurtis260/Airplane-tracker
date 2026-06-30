@@ -4,11 +4,13 @@ import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Map2D } from '@/components/map-2d';
 import { AirplaneCard } from '@/components/airplane-card';
+import { AirportCard } from '@/components/airport-card';
 import { AirplaneList } from '@/components/airplane-list';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAirplanes } from '@/lib/airplane-api';
+import { AirportData } from '@/lib/airports';
 import { Airplane, UserLocation } from '@/lib/types';
 import { Plane, AlertCircle, List, Map } from 'lucide-react';
 
@@ -17,6 +19,7 @@ function TrackerContent() {
   const router = useRouter();
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
   const [selectedAirplane, setSelectedAirplane] = useState<Airplane | null>(null);
+  const [selectedAirport, setSelectedAirport] = useState<AirportData | null>(null);
   const [viewMode, setViewMode] = useState<'map' | 'list'>('map');
   const [radius] = useState(100); // km
 
@@ -119,13 +122,23 @@ function TrackerContent() {
       {viewMode === 'map' ? (
         <div 
           className="absolute inset-0"
-          onClick={() => setSelectedAirplane(null)}
+          onClick={() => {
+            setSelectedAirplane(null);
+            setSelectedAirport(null);
+          }}
         >
           <Map2D
             userLocation={userLocation}
             airplanes={airplanes}
             selectedAirplane={selectedAirplane}
-            onAirplaneClick={setSelectedAirplane}
+            onAirplaneClick={(airplane) => {
+              setSelectedAirplane(airplane);
+              setSelectedAirport(null);
+            }}
+            onAirportClick={(airport) => {
+              setSelectedAirport(airport);
+              setSelectedAirplane(null);
+            }}
             radius={radius}
           />
         </div>
@@ -139,8 +152,16 @@ function TrackerContent() {
         </div>
       )}
 
+      {/* Airport Details - shows only in map view */}
+      {selectedAirport && viewMode === 'map' && (
+        <AirportCard
+          airport={selectedAirport}
+          onClose={() => setSelectedAirport(null)}
+        />
+      )}
+
       {/* Airplane Details - shows in both views */}
-      {selectedAirplane && viewMode === 'map' && (
+      {selectedAirplane && viewMode === 'map' && !selectedAirport && (
         <AirplaneCard
           airplane={selectedAirplane}
           onClose={() => setSelectedAirplane(null)}
