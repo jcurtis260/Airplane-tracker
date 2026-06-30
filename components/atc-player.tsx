@@ -38,7 +38,7 @@ export function ATCPlayer({ icao, onClose }: ATCPlayerProps) {
   const [atcData, setAtcData] = useState<ATCFrequencyData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(false); // Start minimized for mobile
   const [selectedFrequency, setSelectedFrequency] = useState<any>(null);
 
   useEffect(() => {
