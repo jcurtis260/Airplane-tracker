@@ -149,5 +149,27 @@ export function getCacheStats() {
       count: aircraft.size,
       ttl: '7 days',
     },
+    totalSize: routes.size + aircraft.size,
   };
+}
+
+/**
+ * Get cache size in approximate bytes
+ */
+export function getCacheSizeEstimate(): string {
+  try {
+    let totalSize = 0;
+    for (const key of Object.values(CACHE_KEYS)) {
+      const item = localStorage.getItem(key);
+      if (item) {
+        totalSize += item.length * 2; // 2 bytes per char in UTF-16
+      }
+    }
+    
+    if (totalSize < 1024) return `${totalSize} bytes`;
+    if (totalSize < 1024 * 1024) return `${Math.round(totalSize / 1024)} KB`;
+    return `${(totalSize / (1024 * 1024)).toFixed(2)} MB`;
+  } catch {
+    return 'Unknown';
+  }
 }
