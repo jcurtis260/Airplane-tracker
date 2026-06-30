@@ -7,8 +7,9 @@ const CACHE_TTL = 3600000; // 1 hour
 
 /**
  * Fetch flight route from adsbdb.com (primary source)
+ * Also tries registration-based lookup as fallback
  */
-async function fetchFromAdsbdb(callsign: string): Promise<FlightRoute | null> {
+async function fetchFromAdsbdb(callsign: string, registration?: string): Promise<FlightRoute | null> {
   try {
     console.log(`[SERVER][ADSBDB] Fetching route for: ${callsign}`);
     const response = await fetch(
@@ -28,12 +29,40 @@ async function fetchFromAdsbdb(callsign: string): Promise<FlightRoute | null> {
       return null;
     }
 
-    const data = await response.json();
+    let data = await response.json();
     console.log(`[SERVER][ADSBDB] Response data:`, JSON.stringify(data, null, 2));
     
-    if (!data.response) {
-      console.log(`[SERVER][ADSBDB] No response field in data`);
-      return null;
+    if (!data.response || !data.response.flightroute) {
+      console.log(`[SERVER][ADSBDB] No flightroute in response`);
+      
+      // Try registration-based lookup if available
+      if (registration && registration !== callsign) {
+        console.log(`[SERVER][ADSBDB] Trying registration lookup: ${registration}`);
+        try {
+          const regResponse = await fetch(
+            `https://api.adsbdb.com/v0/callsign/${registration}`,
+            {
+              headers: { 
+                'Accept': 'application/json',
+                'User-Agent': 'Airplane-Tracker/1.0'
+              },
+            }
+          );
+          if (regResponse.ok) {
+            const regData = await regResponse.json();
+            if (regData.response?.flightroute) {
+              data = regData;
+              console.log(`[SERVER][ADSBDB] Found via registration!`);
+            }
+          }
+        } catch (e) {
+          console.log(`[SERVER][ADSBDB] Registration lookup failed`);
+        }
+      }
+      
+      if (!data.response?.flightroute) {
+        return null;
+      }
     }
 
     const route: FlightRoute = {
@@ -89,8 +118,9 @@ async function fetchAirportDetails(icaoCode: string): Promise<any> {
 /**
  * Fetch flight route from hexdb.io (fallback)
  * Returns simple route string like "EIDW-EGLL" that needs parsing
+ * Tries both ICAO and IATA callsign formats
  */
-async function fetchFromHexdb(callsign: string): Promise<FlightRoute | null> {
+async function fetchFromHexdb(callsign: string, registration?: string): Promise<FlightRoute | null> {
   try {
     console.log(`[SERVER][HEXDB] Fetching route for: ${callsign}`);
     
@@ -126,13 +156,41 @@ async function fetchFromHexdb(callsign: string): Promise<FlightRoute | null> {
       return null;
     }
 
-    const data = await response.json();
+    let data = await response.json();
     console.log(`[SERVER][HEXDB] Response data:`, JSON.stringify(data, null, 2));
 
     // Parse route string like "EIDW-EGLL"
     if (!data.route || typeof data.route !== 'string') {
       console.log(`[SERVER][HEXDB] No route string found`);
-      return null;
+      
+      // Try registration if available
+      if (registration && registration !== callsign) {
+        console.log(`[SERVER][HEXDB] Trying registration: ${registration}`);
+        try {
+          const regResponse = await fetch(
+            `https://hexdb.io/api/v1/route/icao/${registration}`,
+            {
+              headers: { 
+                'Accept': 'application/json',
+                'User-Agent': 'Airplane-Tracker/1.0'
+              },
+            }
+          );
+          if (regResponse.ok) {
+            const regData = await regResponse.json();
+            if (regData.route) {
+              data = regData;
+              console.log(`[SERVER][HEXDB] Found via registration!`);
+            }
+          }
+        } catch (e) {
+          console.log(`[SERVER][HEXDB] Registration lookup failed`);
+        }
+      }
+      
+      if (!data.route) {
+        return null;
+      }
     }
 
     const routeParts = data.route.split('-');
@@ -180,6 +238,7 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const callsign = searchParams.get('callsign');
+    const registration = searchParams.get('registration'); // Optional registration for better lookup
 
     if (!callsign || callsign.trim().length === 0) {
       return NextResponse.json(
@@ -190,7 +249,8 @@ export async function GET(request: NextRequest) {
 
     // Clean callsign: remove spaces, convert to uppercase
     const cleanCallsign = callsign.trim().toUpperCase().replace(/\s+/g, '');
-    console.log(`[SERVER][ROUTE] ===== Request for: ${cleanCallsign} (original: ${callsign}) =====`);
+    const cleanRegistration = registration?.trim().toUpperCase().replace(/\s+/g, '');
+    console.log(`[SERVER][ROUTE] ===== Request for: ${cleanCallsign}${cleanRegistration ? ` (reg: ${cleanRegistration})` : ''} =====`);
 
     // Check cache
     const cached = routeCache.get(cleanCallsign);
@@ -199,14 +259,14 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(cached.route);
     }
 
-    // Try adsbdb.com first (primary source)
+    // Try adsbdb.com first (primary source) - with registration fallback
     console.log(`[SERVER][ROUTE] Trying ADSBDB for: ${cleanCallsign}`);
-    let route = await fetchFromAdsbdb(cleanCallsign);
+    let route = await fetchFromAdsbdb(cleanCallsign, cleanRegistration);
     
     // Fallback to hexdb.io if adsbdb has no data
     if (!route) {
       console.log(`[SERVER][ROUTE] ADSBDB returned null, trying HEXDB...`);
-      route = await fetchFromHexdb(cleanCallsign);
+      route = await fetchFromHexdb(cleanCallsign, cleanRegistration);
     } else {
       console.log(`[SERVER][ROUTE] ADSBDB succeeded for: ${cleanCallsign}`);
     }
