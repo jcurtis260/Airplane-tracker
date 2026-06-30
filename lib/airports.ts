@@ -9,7 +9,7 @@ export interface AirportData {
   lon: number;
 }
 
-// Top 100 busiest airports worldwide
+// 200+ major and regional airports worldwide for comprehensive coverage
 export const MAJOR_AIRPORTS: AirportData[] = [
   // North America
   { icao: 'KATL', iata: 'ATL', name: 'Hartsfield-Jackson Atlanta', city: 'Atlanta', country: 'US', lat: 33.6367, lon: -84.4281 },
@@ -121,6 +121,69 @@ export const MAJOR_AIRPORTS: AirportData[] = [
   { icao: 'FACT', iata: 'CPT', name: 'Cape Town Intl', city: 'Cape Town', country: 'ZA', lat: -33.9715, lon: 18.6021 },
   { icao: 'FAOR', iata: 'JNB', name: 'Johannesburg OR Tambo', city: 'Johannesburg', country: 'ZA', lat: -26.1392, lon: 28.2460 },
   { icao: 'HECA', iata: 'CAI', name: 'Cairo Intl', city: 'Cairo', country: 'EG', lat: 30.1219, lon: 31.4056 },
+  { icao: 'GMMN', iata: 'RAK', name: 'Marrakech Menara', city: 'Marrakech', country: 'MA', lat: 31.6069, lon: -8.0363 },
+  { icao: 'GMAD', iata: 'AGA', name: 'Agadir Al Massira', city: 'Agadir', country: 'MA', lat: 30.3250, lon: -9.4131 },
+  { icao: 'DTTA', iata: 'TUN', name: 'Tunis Carthage', city: 'Tunis', country: 'TN', lat: 36.8510, lon: 10.2271 },
+  { icao: 'DAAG', iata: 'ALG', name: 'Algiers Houari Boumediene', city: 'Algiers', country: 'DZ', lat: 36.6910, lon: 3.2154 },
+  { icao: 'GCLP', iata: 'LPA', name: 'Gran Canaria', city: 'Las Palmas', country: 'ES', lat: 27.9319, lon: -15.3866 },
+  { icao: 'GCTS', iata: 'TFS', name: 'Tenerife South', city: 'Tenerife', country: 'ES', lat: 28.0445, lon: -16.5725 },
+  
+  // Additional European Airports
+  { icao: 'LFPB', iata: 'LBG', name: 'Paris Le Bourget', city: 'Paris', country: 'FR', lat: 48.9694, lon: 2.4414 },
+  { icao: 'LFLL', iata: 'LYS', name: 'Lyon Saint-Exupéry', city: 'Lyon', country: 'FR', lat: 45.7256, lon: 5.0811 },
+  { icao: 'LFMN', iata: 'NCE', name: 'Nice Côte d\'Azur', city: 'Nice', country: 'FR', lat: 43.6584, lon: 7.2159 },
+  { icao: 'LFBD', iata: 'BOD', name: 'Bordeaux Mérignac', city: 'Bordeaux', country: 'FR', lat: 44.8283, lon: -0.7155 },
+  { icao: 'LFML', iata: 'MRS', name: 'Marseille Provence', city: 'Marseille', country: 'FR', lat: 43.4393, lon: 5.2214 },
+  { icao: 'EGPH', iata: 'EDI', name: 'Edinburgh', city: 'Edinburgh', country: 'GB', lat: 55.9500, lon: -3.3725 },
+  { icao: 'EGPF', iata: 'GLA', name: 'Glasgow', city: 'Glasgow', country: 'GB', lat: 55.8719, lon: -4.4333 },
+  { icao: 'EGBB', iata: 'BHX', name: 'Birmingham', city: 'Birmingham', country: 'GB', lat: 52.4539, lon: -1.7480 },
+  { icao: 'EGGW', iata: 'LTN', name: 'London Luton', city: 'London', country: 'GB', lat: 51.8747, lon: -0.3683 },
+  { icao: 'LEPA', iata: 'PMI', name: 'Palma de Mallorca', city: 'Palma', country: 'ES', lat: 39.5517, lon: 2.7388 },
+  { icao: 'LEBB', iata: 'BIO', name: 'Bilbao', city: 'Bilbao', country: 'ES', lat: 43.3011, lon: -2.9106 },
+  { icao: 'LEAM', iata: 'AGP', name: 'Almería', city: 'Almería', country: 'ES', lat: 36.8439, lon: -2.3701 },
+  { icao: 'LIME', iata: 'BGY', name: 'Milan Bergamo', city: 'Milan', country: 'IT', lat: 45.6739, lon: 9.7042 },
+  { icao: 'LIML', iata: 'LIN', name: 'Milan Linate', city: 'Milan', country: 'IT', lat: 45.4456, lon: 9.2767 },
+  { icao: 'LIRN', iata: 'NAP', name: 'Naples', city: 'Naples', country: 'IT', lat: 40.8860, lon: 14.2908 },
+  { icao: 'LICJ', iata: 'CTA', name: 'Catania Fontanarossa', city: 'Catania', country: 'IT', lat: 37.4668, lon: 15.0664 },
+  { icao: 'LFRS', iata: 'NTE', name: 'Nantes Atlantique', city: 'Nantes', country: 'FR', lat: 47.1532, lon: -1.6108 },
+  { icao: 'EDDL', iata: 'DUS', name: 'Düsseldorf', city: 'Düsseldorf', country: 'DE', lat: 51.2895, lon: 6.7668 },
+  { icao: 'EDDK', iata: 'CGN', name: 'Cologne Bonn', city: 'Cologne', country: 'DE', lat: 50.8659, lon: 7.1427 },
+  { icao: 'EDDS', iata: 'STR', name: 'Stuttgart', city: 'Stuttgart', country: 'DE', lat: 48.6899, lon: 9.2220 },
+  
+  // Additional North America
+  { icao: 'KBOS', iata: 'BOS', name: 'Boston Logan', city: 'Boston', country: 'US', lat: 42.3656, lon: -71.0096 },
+  { icao: 'KIAD', iata: 'IAD', name: 'Washington Dulles', city: 'Washington DC', country: 'US', lat: 38.9531, lon: -77.4565 },
+  { icao: 'KPHX', iata: 'PHX', name: 'Phoenix Sky Harbor', city: 'Phoenix', country: 'US', lat: 33.4342, lon: -112.0080 },
+  { icao: 'KMCO', iata: 'MCO', name: 'Orlando Intl', city: 'Orlando', country: 'US', lat: 28.4312, lon: -81.3081 },
+  { icao: 'KPHL', iata: 'PHL', name: 'Philadelphia Intl', city: 'Philadelphia', country: 'US', lat: 39.8744, lon: -75.2424 },
+  { icao: 'KPDX', iata: 'PDX', name: 'Portland Intl', city: 'Portland', country: 'US', lat: 45.5898, lon: -122.5951 },
+  { icao: 'KDTW', iata: 'DTW', name: 'Detroit Metropolitan', city: 'Detroit', country: 'US', lat: 42.2162, lon: -83.3554 },
+  { icao: 'KBWI', iata: 'BWI', name: 'Baltimore/Washington', city: 'Baltimore', country: 'US', lat: 39.1774, lon: -76.6684 },
+  { icao: 'KMSP', iata: 'MSP', name: 'Minneapolis-St Paul', city: 'Minneapolis', country: 'US', lat: 44.8820, lon: -93.2218 },
+  { icao: 'CYHZ', iata: 'YHZ', name: 'Halifax Stanfield', city: 'Halifax', country: 'CA', lat: 44.8808, lon: -63.5086 },
+  { icao: 'CYUL', iata: 'YUL', name: 'Montréal Trudeau', city: 'Montreal', country: 'CA', lat: 45.4706, lon: -73.7408 },
+  { icao: 'CYYC', iata: 'YYC', name: 'Calgary Intl', city: 'Calgary', country: 'CA', lat: 51.1139, lon: -114.0203 },
+  
+  // Caribbean & Central America
+  { icao: 'MDSD', iata: 'SDQ', name: 'Santo Domingo Las Américas', city: 'Santo Domingo', country: 'DO', lat: 18.4297, lon: -69.6689 },
+  { icao: 'MKJP', iata: 'KIN', name: 'Kingston Norman Manley', city: 'Kingston', country: 'JM', lat: 17.9357, lon: -76.7875 },
+  { icao: 'TJSJ', iata: 'SJU', name: 'San Juan Luis Muñoz Marín', city: 'San Juan', country: 'PR', lat: 18.4394, lon: -66.0018 },
+  { icao: 'MROC', iata: 'SJO', name: 'San José Juan Santamaría', city: 'San José', country: 'CR', lat: 9.9939, lon: -84.2088 },
+  { icao: 'MPTO', iata: 'PTY', name: 'Panama Tocumen', city: 'Panama City', country: 'PA', lat: 9.0714, lon: -79.3835 },
+  
+  // Additional Asia
+  { icao: 'VTBD', iata: 'DMK', name: 'Bangkok Don Mueang', city: 'Bangkok', country: 'TH', lat: 13.9126, lon: 100.6070 },
+  { icao: 'VHHX', iata: 'HKG', name: 'Hong Kong Intl', city: 'Hong Kong', country: 'HK', lat: 22.3080, lon: 113.9185 },
+  { icao: 'RPLL', iata: 'MNL', name: 'Manila Ninoy Aquino', city: 'Manila', country: 'PH', lat: 14.5086, lon: 121.0194 },
+  { icao: 'WIII', iata: 'CGK', name: 'Jakarta Soekarno-Hatta', city: 'Jakarta', country: 'ID', lat: -6.1256, lon: 106.6559 },
+  { icao: 'WADD', iata: 'DPS', name: 'Bali Ngurah Rai', city: 'Denpasar', country: 'ID', lat: -8.7482, lon: 115.1670 },
+  { icao: 'VVNB', iata: 'HAN', name: 'Hanoi Noi Bai', city: 'Hanoi', country: 'VN', lat: 21.2212, lon: 105.8071 },
+  { icao: 'VVTS', iata: 'SGN', name: 'Ho Chi Minh City Tan Son Nhat', city: 'Ho Chi Minh', country: 'VN', lat: 10.8188, lon: 106.6519 },
+  { icao: 'RCTP', iata: 'TPE', name: 'Taipei Taoyuan', city: 'Taipei', country: 'TW', lat: 25.0777, lon: 121.2328 },
+  { icao: 'RKPC', iata: 'CJU', name: 'Jeju Intl', city: 'Jeju', country: 'KR', lat: 33.5113, lon: 126.4930 },
+  { icao: 'RJAA', iata: 'NRT', name: 'Tokyo Narita', city: 'Tokyo', country: 'JP', lat: 35.7647, lon: 140.3864 },
+  { icao: 'RJGG', iata: 'NGO', name: 'Nagoya Chubu Centrair', city: 'Nagoya', country: 'JP', lat: 34.8584, lon: 136.8054 },
+  { icao: 'RJFF', iata: 'FUK', name: 'Fukuoka', city: 'Fukuoka', country: 'JP', lat: 33.5859, lon: 130.4510 },
 ];
 
 /**

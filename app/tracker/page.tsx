@@ -7,6 +7,7 @@ import { AirplaneCard } from '@/components/airplane-card';
 import { AirportCard } from '@/components/airport-card';
 import { AirplaneList } from '@/components/airplane-list';
 import { CacheStats } from '@/components/cache-stats';
+import { RadiusControl } from '@/components/radius-control';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -22,7 +23,7 @@ function TrackerContent() {
   const [selectedAirplane, setSelectedAirplane] = useState<Airplane | null>(null);
   const [selectedAirport, setSelectedAirport] = useState<AirportData | null>(null);
   const [viewMode, setViewMode] = useState<'map' | 'list'>('map');
-  const [radius] = useState(100); // km
+  const [radius, setRadius] = useState(100); // km - default 100km
 
   // Initialize location from URL params or localStorage
   useEffect(() => {
@@ -118,6 +119,9 @@ function TrackerContent() {
           )}
         </Button>
       </div>
+
+      {/* Radius Control */}
+      <RadiusControl radius={radius} onRadiusChange={setRadius} />
 
       {/* Map or List View */}
       {viewMode === 'map' ? (
