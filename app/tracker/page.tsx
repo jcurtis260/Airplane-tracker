@@ -4,17 +4,20 @@ import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Map2D } from '@/components/map-2d';
 import { AirplaneCard } from '@/components/airplane-card';
+import { AirplaneList } from '@/components/airplane-list';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAirplanes } from '@/lib/airplane-api';
 import { Airplane, UserLocation } from '@/lib/types';
-import { Plane, AlertCircle } from 'lucide-react';
+import { Plane, AlertCircle, List, Map } from 'lucide-react';
 
 function TrackerContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
   const [selectedAirplane, setSelectedAirplane] = useState<Airplane | null>(null);
+  const [viewMode, setViewMode] = useState<'map' | 'list'>('map');
   const [radius] = useState(100); // km
 
   // Initialize location from URL params or localStorage
@@ -79,22 +82,8 @@ function TrackerContent() {
 
   return (
     <div className="relative w-screen h-screen overflow-hidden">
-      {/* Map - clicking on it closes the detail card */}
-      <div 
-        className="absolute inset-0"
-        onClick={() => setSelectedAirplane(null)}
-      >
-        <Map2D
-          userLocation={userLocation}
-          airplanes={airplanes}
-          selectedAirplane={selectedAirplane}
-          onAirplaneClick={setSelectedAirplane}
-          radius={radius}
-        />
-      </div>
-
-      {/* Airplane Count Badge */}
-      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10">
+      {/* View Toggle and Count */}
+      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2">
         <Badge variant="secondary" className="px-4 py-2 text-base shadow-lg">
           <Plane className="h-4 w-4 mr-2" />
           {isLoading ? (
@@ -105,14 +94,67 @@ function TrackerContent() {
             </>
           )}
         </Badge>
+        
+        <Button
+          variant="secondary"
+          size="sm"
+          className="shadow-lg"
+          onClick={() => setViewMode(viewMode === 'map' ? 'list' : 'map')}
+        >
+          {viewMode === 'map' ? (
+            <>
+              <List className="h-4 w-4 mr-2" />
+              List
+            </>
+          ) : (
+            <>
+              <Map className="h-4 w-4 mr-2" />
+              Map
+            </>
+          )}
+        </Button>
       </div>
 
-      {/* Airplane Details */}
-      {selectedAirplane && (
+      {/* Map or List View */}
+      {viewMode === 'map' ? (
+        <div 
+          className="absolute inset-0"
+          onClick={() => setSelectedAirplane(null)}
+        >
+          <Map2D
+            userLocation={userLocation}
+            airplanes={airplanes}
+            selectedAirplane={selectedAirplane}
+            onAirplaneClick={setSelectedAirplane}
+            radius={radius}
+          />
+        </div>
+      ) : (
+        <div className="absolute inset-0 bg-background">
+          <AirplaneList
+            airplanes={airplanes}
+            selectedAirplane={selectedAirplane}
+            onAirplaneClick={setSelectedAirplane}
+          />
+        </div>
+      )}
+
+      {/* Airplane Details - shows in both views */}
+      {selectedAirplane && viewMode === 'map' && (
         <AirplaneCard
           airplane={selectedAirplane}
           onClose={() => setSelectedAirplane(null)}
         />
+      )}
+      
+      {/* Airplane Details - bottom sheet for list view */}
+      {selectedAirplane && viewMode === 'list' && (
+        <div className="absolute bottom-0 left-0 right-0 z-20 max-h-[70vh] overflow-hidden">
+          <AirplaneCard
+            airplane={selectedAirplane}
+            onClose={() => setSelectedAirplane(null)}
+          />
+        </div>
       )}
 
       {/* Empty State */}
