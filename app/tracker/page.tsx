@@ -79,8 +79,11 @@ function TrackerContent() {
 
   return (
     <div className="relative w-screen h-screen overflow-hidden">
-      {/* Map */}
-      <div className="absolute inset-0">
+      {/* Map - clicking on it closes the detail card */}
+      <div 
+        className="absolute inset-0"
+        onClick={() => setSelectedAirplane(null)}
+      >
         <Map2D
           userLocation={userLocation}
           airplanes={airplanes}

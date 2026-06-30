@@ -113,6 +113,9 @@ export function Map2D({
                   ? `rotate(${airplane.track}deg)` 
                   : undefined,
               }}
+              onClick={(e) => {
+                e.stopPropagation(); // Prevent map click from closing
+              }}
             >
               <Plane
                 className={`w-6 h-6 ${isSelected ? 'drop-shadow-lg' : ''}`}

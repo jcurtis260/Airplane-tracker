@@ -41,7 +41,10 @@ export function AirplaneCard({ airplane, onClose }: AirplaneCardProps) {
   }, [airplane.flight, airplane.hex]);
 
   return (
-    <Card className="absolute left-4 top-4 w-80 max-h-[calc(100vh-2rem)] overflow-y-auto z-10 shadow-lg">
+    <Card 
+      className="absolute left-4 top-4 w-80 max-h-[calc(100vh-2rem)] overflow-y-auto z-10 shadow-lg"
+      onClick={(e) => e.stopPropagation()} // Prevent click from closing
+    >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-2">
@@ -64,20 +67,20 @@ export function AirplaneCard({ airplane, onClose }: AirplaneCardProps) {
         {/* Basic Info */}
         <div className="space-y-2">
           <h3 className="text-sm font-semibold text-muted-foreground">Identification</h3>
-          <div className="space-y-1 text-sm">
-            <div className="flex justify-between">
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between items-center gap-2">
               <span className="text-muted-foreground">Callsign:</span>
-              <span className="font-medium">{airplane.flight?.trim() || 'N/A'}</span>
+              <span className="font-semibold text-base">{airplane.flight?.trim() || 'N/A'}</span>
             </div>
-            <div className="flex justify-between">
+            <div className="flex justify-between items-center gap-2">
               <span className="text-muted-foreground">Registration:</span>
               <span className="font-medium">{airplane.r || airplane.registration || 'N/A'}</span>
             </div>
-            <div className="flex justify-between">
+            <div className="flex justify-between items-center gap-2">
               <span className="text-muted-foreground">ICAO Hex:</span>
-              <span className="font-mono text-xs">{airplane.hex.toUpperCase()}</span>
+              <span className="font-mono text-xs bg-secondary px-2 py-0.5 rounded">{airplane.hex.toUpperCase()}</span>
             </div>
-            <div className="flex justify-between">
+            <div className="flex justify-between items-center gap-2">
               <span className="text-muted-foreground">Country:</span>
               <span className="font-medium">{getCountryFromICAO(airplane.hex)}</span>
             </div>
@@ -86,7 +89,7 @@ export function AirplaneCard({ airplane, onClose }: AirplaneCardProps) {
 
         {/* Flight Route */}
         {airplane.flight && (
-          <div className="space-y-2">
+          <div className="space-y-2 p-3 bg-secondary/50 rounded-lg">
             <h3 className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
               <MapPin className="h-4 w-4" />
               Flight Route
@@ -97,26 +100,33 @@ export function AirplaneCard({ airplane, onClose }: AirplaneCardProps) {
                 Loading route...
               </div>
             ) : route?.origin || route?.destination ? (
-              <div className="space-y-1 text-sm">
+              <div className="space-y-2 text-sm">
                 {route.origin && (
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">From:</span>
-                    <span className="font-medium text-right max-w-[200px] truncate" title={formatAirport(route.origin)}>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-xs text-muted-foreground uppercase tracking-wide">From</span>
+                    <span className="font-semibold text-base" title={formatAirport(route.origin)}>
                       {formatAirport(route.origin)}
                     </span>
                   </div>
                 )}
+                {route.origin && route.destination && (
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <div className="flex-1 border-t border-dashed" />
+                    <span className="text-xs">✈</span>
+                    <div className="flex-1 border-t border-dashed" />
+                  </div>
+                )}
                 {route.destination && (
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">To:</span>
-                    <span className="font-medium text-right max-w-[200px] truncate" title={formatAirport(route.destination)}>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-xs text-muted-foreground uppercase tracking-wide">To</span>
+                    <span className="font-semibold text-base" title={formatAirport(route.destination)}>
                       {formatAirport(route.destination)}
                     </span>
                   </div>
                 )}
               </div>
             ) : route === null ? (
-              <p className="text-xs text-muted-foreground">Route information not available</p>
+              <p className="text-xs text-muted-foreground italic">Route information not available for this flight</p>
             ) : null}
           </div>
         )}
@@ -138,18 +148,18 @@ export function AirplaneCard({ airplane, onClose }: AirplaneCardProps) {
         {(airplane.lat !== undefined && airplane.lon !== undefined) && (
           <div className="space-y-2">
             <h3 className="text-sm font-semibold text-muted-foreground">Position</h3>
-            <div className="space-y-1 text-sm">
-              <div className="flex justify-between">
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between items-center gap-2">
                 <span className="text-muted-foreground">Latitude:</span>
-                <span className="font-mono text-xs">{airplane.lat.toFixed(4)}°</span>
+                <span className="font-mono text-xs bg-secondary px-2 py-0.5 rounded">{airplane.lat.toFixed(4)}°</span>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center gap-2">
                 <span className="text-muted-foreground">Longitude:</span>
-                <span className="font-mono text-xs">{airplane.lon.toFixed(4)}°</span>
+                <span className="font-mono text-xs bg-secondary px-2 py-0.5 rounded">{airplane.lon.toFixed(4)}°</span>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center gap-2">
                 <span className="text-muted-foreground">Altitude:</span>
-                <span className="font-medium" style={{ color: altitudeColor }}>
+                <span className="font-semibold text-base px-2 py-0.5 rounded" style={{ color: altitudeColor, backgroundColor: `${altitudeColor}20` }}>
                   {formatAltitude(airplane.alt_baro)}
                 </span>
               </div>
@@ -160,23 +170,25 @@ export function AirplaneCard({ airplane, onClose }: AirplaneCardProps) {
         {/* Motion */}
         <div className="space-y-2">
           <h3 className="text-sm font-semibold text-muted-foreground">Motion</h3>
-          <div className="space-y-1 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Ground Speed:</span>
-              <span className="font-medium">{formatSpeed(airplane.gs)}</span>
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between items-center gap-2">
+              <span className="text-muted-foreground">Speed:</span>
+              <span className="font-semibold">{formatSpeed(airplane.gs)}</span>
             </div>
-            <div className="flex justify-between">
+            <div className="flex justify-between items-center gap-2">
               <span className="text-muted-foreground">Heading:</span>
-              <span className="font-medium">
+              <span className="font-semibold">
                 {airplane.track !== undefined 
-                  ? `${Math.round(airplane.track)}° (${getCardinalDirection(airplane.track)})`
+                  ? `${Math.round(airplane.track)}° ${getCardinalDirection(airplane.track)}`
                   : 'N/A'}
               </span>
             </div>
             {airplane.baro_rate !== undefined && airplane.baro_rate !== 0 && (
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Vertical Rate:</span>
-                <span className="font-medium">{formatVerticalRate(airplane.baro_rate)}</span>
+              <div className="flex justify-between items-center gap-2">
+                <span className="text-muted-foreground">Vertical:</span>
+                <span className={`font-semibold ${airplane.baro_rate > 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                  {formatVerticalRate(airplane.baro_rate)}
+                </span>
               </div>
             )}
           </div>
