@@ -6,6 +6,7 @@ import { Map2D } from '@/components/map-2d';
 import { AirplaneCard } from '@/components/airplane-card';
 import { AirportCard } from '@/components/airport-card';
 import { AirplaneList } from '@/components/airplane-list';
+import { CacheStats } from '@/components/cache-stats';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';

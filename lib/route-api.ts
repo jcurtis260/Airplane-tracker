@@ -1,8 +1,9 @@
 import { FlightRoute } from './types';
+import { getCachedRoute, cacheRoute } from './local-cache';
 
 /**
  * Fetch flight route information via server-side API proxy
- * This avoids CORS issues by routing through our Next.js API
+ * Uses local browser cache (24h TTL) to reduce API load
  */
 export async function fetchFlightRoute(callsign: string): Promise<FlightRoute | null> {
   if (!callsign || callsign.trim().length === 0) {
@@ -11,6 +12,14 @@ export async function fetchFlightRoute(callsign: string): Promise<FlightRoute | 
   }
 
   const cleanCallsign = callsign.trim().toUpperCase().replace(/\s+/g, '');
+  
+  // Check local cache first (24 hour TTL)
+  const cachedRoute = getCachedRoute(cleanCallsign);
+  if (cachedRoute !== null) {
+    console.log(`[CLIENT][ROUTE] 💾 Using cached route for: ${cleanCallsign}`);
+    return cachedRoute;
+  }
+  
   console.log(`[CLIENT][ROUTE] 🔍 Fetching route for: ${cleanCallsign}`);
   
   try {
@@ -22,10 +31,15 @@ export async function fetchFlightRoute(callsign: string): Promise<FlightRoute | 
     
     if (!response.ok) {
       console.warn(`[CLIENT][ROUTE] ⚠️  API returned ${response.status} for ${cleanCallsign}`);
+      // Cache null result to avoid repeated failed lookups
+      cacheRoute(cleanCallsign, null);
       return null;
     }
 
     const route = await response.json();
+    
+    // Cache the result (even if null)
+    cacheRoute(cleanCallsign, route);
     
     if (route && (route.origin || route.destination)) {
       console.log(`[CLIENT][ROUTE] ✅ Route found for ${cleanCallsign}:`, 
