@@ -109,9 +109,10 @@ No environment variables are required! The app uses free APIs:
 - **[hexdb.io](https://hexdb.io/)** (fallback): Route data and airport information
 
 ### ATC Radio
-- **[LiveATC.net](https://www.liveatc.net/)**: Live Air Traffic Control audio streams
-  - Coverage: 40+ major airports worldwide
-  - Opens in external player for streaming
+- **Real VHF Frequencies**: Actual frequencies for physical/SDR listening
+- **[LiveATC.net](https://www.liveatc.net/)**: Live streams (mainly US)
+- **[ATC-Live.com](https://www.atc-live.com/)**: Live streams (UK/Europe)
+  - Coverage: UK (Heathrow, Gatwick, Stansted, Manchester), Spain (Madrid, Barcelona, Málaga, Bilbao), France, Germany, Netherlands, Ireland, and major US airports
 
 ### Performance Optimizations
 The app implements multi-layer caching to reduce API calls:

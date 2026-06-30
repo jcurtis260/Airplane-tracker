@@ -1,183 +1,70 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { ATCFrequency } from '@/lib/types';
+import { getATCFrequencies, hasATCData } from '@/lib/atc-frequencies';
 
 /**
- * LiveATC.net API proxy for fetching nearby ATC frequencies
+ * ATC Frequency API - Returns real-world VHF frequencies and streaming links
  * 
- * Note: LiveATC.net doesn't have a public REST API, so we'll use a combination of:
- * 1. Known airport ICAO codes to construct LiveATC URLs
- * 2. Manual mapping of major airports to their LiveATC feeds
- * 
- * In production, you could scrape LiveATC or use their RSS feeds
+ * Data sources:
+ * - Real VHF frequencies for physical/SDR listening
+ * - LiveATC.net streams (mainly US coverage)
+ * - ATC-Live.com streams (UK/European coverage)
+ * - Broadcastify feeds
  */
 
 // Cache for ATC frequency lookups
-const atcCache = new Map<string, { frequencies: ATCFrequency[]; timestamp: number }>();
+const atcCache = new Map<string, { data: any; timestamp: number }>();
 const CACHE_TTL = 3600000; // 1 hour (frequencies rarely change)
 
-/**
- * Manual mapping of major airports to their LiveATC feed codes
- * Format: ICAO -> LiveATC code
- */
-const LIVEATC_CODES: Record<string, string> = {
-  // United States
-  'KJFK': 'kjfk',
-  'KLAX': 'klax',
-  'KORD': 'kord',
-  'KATL': 'katl',
-  'KDFW': 'kdfw',
-  'KDEN': 'kden',
-  'KSFO': 'ksfo',
-  'KLAS': 'klas',
-  'KMIA': 'kmia',
-  'KBOS': 'kbos',
-  'KEWR': 'kewr',
-  'KSEA': 'ksea',
-  'KPHX': 'kphx',
-  'KIAD': 'kiad',
-  'KJAX': 'kjax',
-  
-  // Europe
-  'EGLL': 'egll', // London Heathrow
-  'EGKK': 'egkk', // London Gatwick
-  'EHAM': 'eham', // Amsterdam Schiphol
-  'LFPG': 'lfpg', // Paris CDG
-  'EDDF': 'eddf', // Frankfurt
-  'LEMD': 'lemd', // Madrid
-  'LIRF': 'lirf', // Rome Fiumicino
-  'EIDW': 'eidw', // Dublin
-  'EKCH': 'ekch', // Copenhagen
-  
-  // Asia Pacific
-  'RJTT': 'rjtt', // Tokyo Haneda
-  'VHHH': 'vhhh', // Hong Kong
-  'WSSS': 'wsss', // Singapore Changi
-  'YSSY': 'yssy', // Sydney
-  'NZAA': 'nzaa', // Auckland
-  
-  // Canada
-  'CYYZ': 'cyyz', // Toronto Pearson
-  'CYVR': 'cyvr', // Vancouver
-};
 
-/**
- * Get common ATC frequency types for an airport
- */
-function getAirportFrequencies(icao: string): ATCFrequency[] {
-  const liveAtcCode = LIVEATC_CODES[icao.toUpperCase()];
-  
-  if (!liveAtcCode) {
-    return [];
-  }
-
-  const baseUrl = `https://www.liveatc.net/play/${liveAtcCode}`;
-  
-  // Common frequency types for most airports
-  const frequencies: ATCFrequency[] = [
-    {
-      id: `${icao}-tower`,
-      name: `${icao} Tower`,
-      type: 'tower',
-      streamUrl: `${baseUrl}_twr.pls`,
-      airport: icao,
-      icao: icao,
-    },
-    {
-      id: `${icao}-ground`,
-      name: `${icao} Ground`,
-      type: 'ground',
-      streamUrl: `${baseUrl}_gnd.pls`,
-      airport: icao,
-      icao: icao,
-    },
-    {
-      id: `${icao}-approach`,
-      name: `${icao} Approach`,
-      type: 'approach',
-      streamUrl: `${baseUrl}_app.pls`,
-      airport: icao,
-      icao: icao,
-    },
-    {
-      id: `${icao}-departure`,
-      name: `${icao} Departure`,
-      type: 'departure',
-      streamUrl: `${baseUrl}_dep.pls`,
-      airport: icao,
-      icao: icao,
-    },
-  ];
-
-  return frequencies;
-}
-
-/**
- * Get ATC frequencies for nearby airports
- */
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const icao = searchParams.get('icao');
-    const lat = parseFloat(searchParams.get('lat') || '0');
-    const lon = parseFloat(searchParams.get('lon') || '0');
 
-    // If specific airport requested
-    if (icao) {
-      const cacheKey = `icao:${icao.toUpperCase()}`;
-      const cached = atcCache.get(cacheKey);
-      
-      if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-        console.log(`[SERVER][ATC] 💾 Cache hit for: ${icao}`);
-        return NextResponse.json(cached.frequencies, {
-          headers: {
-            'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
-          },
-        });
-      }
+    if (!icao) {
+      return NextResponse.json({
+        error: 'ICAO parameter required',
+        message: 'Provide ?icao=EGLL to get frequencies for a specific airport',
+      }, { status: 400 });
+    }
 
-      const frequencies = getAirportFrequencies(icao.toUpperCase());
-      
-      if (frequencies.length === 0) {
-        return NextResponse.json({
-          error: 'Airport not found or no LiveATC coverage',
-          message: `No ATC feeds available for ${icao.toUpperCase()}`,
-          availableAirports: Object.keys(LIVEATC_CODES),
-        }, { status: 404 });
-      }
-
-      atcCache.set(cacheKey, { frequencies, timestamp: Date.now() });
-
-      return NextResponse.json(frequencies, {
+    const cleanIcao = icao.toUpperCase();
+    
+    // Check cache
+    const cacheKey = `icao:${cleanIcao}`;
+    const cached = atcCache.get(cacheKey);
+    
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+      console.log(`[SERVER][ATC] 💾 Cache hit for: ${cleanIcao}`);
+      return NextResponse.json(cached.data, {
         headers: {
           'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
+          'X-Cache-Status': 'HIT',
         },
       });
     }
 
-    // If location provided, find nearby airports with LiveATC coverage
-    if (lat && lon) {
-      // Calculate distance and return closest airports
-      const nearbyAirports = Object.keys(LIVEATC_CODES)
-        .map(icao => {
-          // You would normally look up actual airport coordinates here
-          // For now, just return all available airports
-          return getAirportFrequencies(icao);
-        })
-        .flat()
-        .slice(0, 10); // Limit to 10 feeds
-
-      return NextResponse.json(nearbyAirports, {
-        headers: {
-          'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
-        },
-      });
+    // Get frequency data
+    const atcData = getATCFrequencies(cleanIcao);
+    
+    if (!atcData) {
+      return NextResponse.json({
+        error: 'No ATC data available',
+        message: `No frequency data for ${cleanIcao}`,
+        available: hasATCData(cleanIcao),
+      }, { status: 404 });
     }
 
-    // Return list of available airports
-    return NextResponse.json({
-      availableAirports: Object.keys(LIVEATC_CODES).sort(),
-      message: 'Provide ?icao=KJFK to get frequencies for a specific airport',
-      totalCoverage: Object.keys(LIVEATC_CODES).length,
+    // Cache the result
+    atcCache.set(cacheKey, { data: atcData, timestamp: Date.now() });
+
+    console.log(`[SERVER][ATC] ✓ Returned ${atcData.frequencies.length} frequencies for ${cleanIcao}`);
+
+    return NextResponse.json(atcData, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
+        'X-Cache-Status': 'MISS',
+      },
     });
 
   } catch (error) {
