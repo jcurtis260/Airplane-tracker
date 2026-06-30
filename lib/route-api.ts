@@ -10,23 +10,33 @@ export async function fetchFlightRoute(callsign: string): Promise<FlightRoute | 
     return null;
   }
 
-  const cleanCallsign = callsign.trim().toUpperCase();
-  console.log(`[CLIENT][ROUTE] Fetching route for: ${cleanCallsign}`);
+  const cleanCallsign = callsign.trim().toUpperCase().replace(/\s+/g, '');
+  console.log(`[CLIENT][ROUTE] 🔍 Fetching route for: ${cleanCallsign}`);
   
   try {
-    const response = await fetch(`/api/route?callsign=${encodeURIComponent(cleanCallsign)}`);
+    const response = await fetch(`/api/route?callsign=${encodeURIComponent(cleanCallsign)}`, {
+      headers: {
+        'Accept': 'application/json',
+      },
+    });
     
     if (!response.ok) {
-      console.error(`[CLIENT][ROUTE] API error: ${response.status}`);
+      console.warn(`[CLIENT][ROUTE] ⚠️  API returned ${response.status} for ${cleanCallsign}`);
       return null;
     }
 
     const route = await response.json();
-    console.log(`[CLIENT][ROUTE] Received route for ${cleanCallsign}:`, route);
     
-    return route;
+    if (route && (route.origin || route.destination)) {
+      console.log(`[CLIENT][ROUTE] ✅ Route found for ${cleanCallsign}:`, 
+        `${route.origin?.iata || route.origin?.icao || '?'} → ${route.destination?.iata || route.destination?.icao || '?'}`);
+      return route;
+    } else {
+      console.log(`[CLIENT][ROUTE] ❌ No route data available for ${cleanCallsign}`);
+      return null;
+    }
   } catch (error) {
-    console.error(`[CLIENT][ROUTE] Error fetching route for ${cleanCallsign}:`, error);
+    console.error(`[CLIENT][ROUTE] ❌ Error fetching route for ${cleanCallsign}:`, error);
     return null;
   }
 }

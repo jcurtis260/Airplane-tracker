@@ -31,12 +31,23 @@ export function AirplaneCard({ airplane, onClose }: AirplaneCardProps) {
 
   useEffect(() => {
     // Fetch route information when airplane changes
-    if (airplane.flight) {
+    if (airplane.flight && airplane.flight.trim().length > 0) {
+      const callsign = airplane.flight.trim();
       setLoadingRoute(true);
+      setRoute(undefined);
+      console.log(`Fetching route for: ${callsign}`);
       getAirplaneRoute(airplane.flight)
-        .then(setRoute)
+        .then((routeData) => {
+          console.log(`Route result for ${callsign}:`, routeData);
+          setRoute(routeData);
+        })
+        .catch((error) => {
+          console.error(`Route fetch error for ${callsign}:`, error);
+          setRoute(null);
+        })
         .finally(() => setLoadingRoute(false));
     } else {
+      console.log('No callsign available for route lookup');
       setRoute(null);
     }
   }, [airplane.flight, airplane.hex]);
@@ -149,7 +160,12 @@ export function AirplaneCard({ airplane, onClose }: AirplaneCardProps) {
                 )}
               </div>
             ) : route === null ? (
-              <p className="text-xs text-muted-foreground italic">Route information not available for this flight</p>
+              <div className="text-xs text-muted-foreground">
+                <p className="italic">Route information not available</p>
+                <p className="text-[10px] mt-1 opacity-70">
+                  Many flights don't publicly share route data
+                </p>
+              </div>
             ) : null}
           </div>
         )}

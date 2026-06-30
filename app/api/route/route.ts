@@ -188,8 +188,9 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const cleanCallsign = callsign.trim().toUpperCase();
-    console.log(`[SERVER][ROUTE] ===== Request for: ${cleanCallsign} =====`);
+    // Clean callsign: remove spaces, convert to uppercase
+    const cleanCallsign = callsign.trim().toUpperCase().replace(/\s+/g, '');
+    console.log(`[SERVER][ROUTE] ===== Request for: ${cleanCallsign} (original: ${callsign}) =====`);
 
     // Check cache
     const cached = routeCache.get(cleanCallsign);
