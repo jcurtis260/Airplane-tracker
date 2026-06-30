@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import Map, { Marker, Source, Layer, MapRef } from 'react-map-gl/maplibre';
 import { Airplane, UserLocation } from '@/lib/types';
 import { getAltitudeColor } from '@/lib/airplane-api';
-import { Plane } from 'lucide-react';
+import { getAirportsInRange } from '@/lib/airports';
+import { Plane, MapPin } from 'lucide-react';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
 interface Map2DProps {
@@ -28,6 +29,11 @@ export function Map2D({
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Get airports in range
+  const nearbyAirports = useMemo(() => {
+    return getAirportsInRange(userLocation.lat, userLocation.lon, radius * 2); // Show airports in 2x radius
+  }, [userLocation.lat, userLocation.lon, radius]);
 
   // Create GeoJSON for the radius circle
   const radiusCircle = {
@@ -85,6 +91,25 @@ export function Map2D({
           <div className="w-3 h-3 bg-blue-500 rounded-full border-2 border-white shadow-lg" />
         </div>
       </Marker>
+
+      {/* Airport markers */}
+      {nearbyAirports.map((airport) => (
+        <Marker
+          key={airport.icao}
+          latitude={airport.lat}
+          longitude={airport.lon}
+          anchor="center"
+        >
+          <div className="relative group">
+            <div className="w-3 h-3 bg-purple-500 rounded-full border border-white shadow-md opacity-60 group-hover:opacity-100 transition-opacity" />
+            <MapPin className="absolute -top-4 -left-2 w-4 h-4 text-purple-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20">
+              <div className="font-semibold">{airport.iata}</div>
+              <div className="text-[10px]">{airport.name}</div>
+            </div>
+          </div>
+        </Marker>
+      ))}
 
       {/* Airplane markers */}
       {airplanes.map((airplane) => {

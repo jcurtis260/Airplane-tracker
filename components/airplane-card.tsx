@@ -27,6 +27,7 @@ export function AirplaneCard({ airplane, onClose }: AirplaneCardProps) {
   const altitudeColor = getAltitudeColor(airplane.alt_baro);
   const [route, setRoute] = useState<FlightRoute | null | undefined>(undefined);
   const [loadingRoute, setLoadingRoute] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     // Fetch route information when airplane changes
@@ -39,6 +40,11 @@ export function AirplaneCard({ airplane, onClose }: AirplaneCardProps) {
       setRoute(null);
     }
   }, [airplane.flight, airplane.hex]);
+
+  // Reset image error when airplane changes
+  useEffect(() => {
+    setImageError(false);
+  }, [airplane.hex]);
 
   return (
     <Card 
@@ -64,6 +70,19 @@ export function AirplaneCard({ airplane, onClose }: AirplaneCardProps) {
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
+        {/* Aircraft Image */}
+        {!imageError && (
+          <div className="relative w-full h-32 bg-secondary/30 rounded-lg overflow-hidden">
+            <img
+              src={`https://hexdb.io/hex-image-thumb?hex=${airplane.hex}`}
+              alt={`Aircraft ${airplane.hex}`}
+              className="w-full h-full object-cover"
+              onError={() => setImageError(true)}
+              loading="lazy"
+            />
+          </div>
+        )}
+
         {/* Basic Info */}
         <div className="space-y-2">
           <h3 className="text-sm font-semibold text-muted-foreground">Identification</h3>

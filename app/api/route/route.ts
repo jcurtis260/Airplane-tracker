@@ -64,13 +64,12 @@ async function fetchFromAdsbdb(callsign: string): Promise<FlightRoute | null> {
 }
 
 /**
- * Fetch flight route from hexdb.io (fallback)
+ * Fetch airport details from hexdb.io
  */
-async function fetchFromHexdb(callsign: string): Promise<FlightRoute | null> {
+async function fetchAirportDetails(icaoCode: string): Promise<any> {
   try {
-    console.log(`[SERVER][HEXDB] Fetching route for: ${callsign}`);
     const response = await fetch(
-      `https://hexdb.io/api/v1/route/${callsign}`,
+      `https://hexdb.io/api/v1/airport/icao/${icaoCode}`,
       {
         headers: { 
           'Accept': 'application/json',
@@ -78,6 +77,47 @@ async function fetchFromHexdb(callsign: string): Promise<FlightRoute | null> {
         },
       }
     );
+
+    if (!response.ok) return null;
+    return await response.json();
+  } catch (error) {
+    console.error(`[SERVER][HEXDB] Airport lookup error for ${icaoCode}:`, error);
+    return null;
+  }
+}
+
+/**
+ * Fetch flight route from hexdb.io (fallback)
+ * Returns simple route string like "EIDW-EGLL" that needs parsing
+ */
+async function fetchFromHexdb(callsign: string): Promise<FlightRoute | null> {
+  try {
+    console.log(`[SERVER][HEXDB] Fetching route for: ${callsign}`);
+    
+    // Try ICAO route first
+    let response = await fetch(
+      `https://hexdb.io/api/v1/route/icao/${callsign}`,
+      {
+        headers: { 
+          'Accept': 'application/json',
+          'User-Agent': 'Airplane-Tracker/1.0'
+        },
+      }
+    );
+
+    // If ICAO fails, try IATA
+    if (!response.ok) {
+      console.log(`[SERVER][HEXDB] ICAO route failed, trying IATA...`);
+      response = await fetch(
+        `https://hexdb.io/api/v1/route/iata/${callsign}`,
+        {
+          headers: { 
+            'Accept': 'application/json',
+            'User-Agent': 'Airplane-Tracker/1.0'
+          },
+        }
+      );
+    }
 
     console.log(`[SERVER][HEXDB] Response status: ${response.status}`);
     if (!response.ok) {
@@ -89,27 +129,47 @@ async function fetchFromHexdb(callsign: string): Promise<FlightRoute | null> {
     const data = await response.json();
     console.log(`[SERVER][HEXDB] Response data:`, JSON.stringify(data, null, 2));
 
+    // Parse route string like "EIDW-EGLL"
+    if (!data.route || typeof data.route !== 'string') {
+      console.log(`[SERVER][HEXDB] No route string found`);
+      return null;
+    }
+
+    const routeParts = data.route.split('-');
+    if (routeParts.length !== 2) {
+      console.log(`[SERVER][HEXDB] Invalid route format: ${data.route}`);
+      return null;
+    }
+
+    const [originIcao, destIcao] = routeParts;
+    console.log(`[SERVER][HEXDB] Parsed route: ${originIcao} -> ${destIcao}`);
+
+    // Fetch airport details for both
+    const [originData, destData] = await Promise.all([
+      fetchAirportDetails(originIcao),
+      fetchAirportDetails(destIcao)
+    ]);
+
     const route: FlightRoute = {
       callsign,
-      origin: data.origin ? {
-        icao: data.origin.icao,
-        iata: data.origin.iata,
-        name: data.origin.name,
-        city: data.origin.city,
-        country: data.origin.country,
-      } : undefined,
-      destination: data.destination ? {
-        icao: data.destination.icao,
-        iata: data.destination.iata,
-        name: data.destination.name,
-        city: data.destination.city,
-        country: data.destination.country,
-      } : undefined,
+      origin: originData ? {
+        icao: originData.icao,
+        iata: originData.iata,
+        name: originData.airport,
+        city: originData.region_name,
+        country: originData.country_code,
+      } : { icao: originIcao },
+      destination: destData ? {
+        icao: destData.icao,
+        iata: destData.iata,
+        name: destData.airport,
+        city: destData.region_name,
+        country: destData.country_code,
+      } : { icao: destIcao },
     };
 
-    const hasRoute = route.origin || route.destination;
-    console.log(`[SERVER][HEXDB] Route found: ${hasRoute}`, route);
-    return hasRoute ? route : null;
+    console.log(`[SERVER][HEXDB] Route constructed:`, route);
+    return route;
   } catch (error) {
     console.error(`[SERVER][HEXDB] Error for ${callsign}:`, error);
     return null;
