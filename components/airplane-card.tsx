@@ -1,9 +1,10 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Airplane } from '@/lib/types';
+import { Airplane, FlightRoute } from '@/lib/types';
 import {
   formatSpeed,
   formatAltitude,
@@ -11,8 +12,10 @@ import {
   getCardinalDirection,
   getCountryFromICAO,
   getAltitudeColor,
+  getAirplaneRoute,
 } from '@/lib/airplane-api';
-import { X, Plane } from 'lucide-react';
+import { formatAirport } from '@/lib/route-api';
+import { X, Plane, MapPin, Loader2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 interface AirplaneCardProps {
@@ -22,6 +25,20 @@ interface AirplaneCardProps {
 
 export function AirplaneCard({ airplane, onClose }: AirplaneCardProps) {
   const altitudeColor = getAltitudeColor(airplane.alt_baro);
+  const [route, setRoute] = useState<FlightRoute | null | undefined>(undefined);
+  const [loadingRoute, setLoadingRoute] = useState(false);
+
+  useEffect(() => {
+    // Fetch route information when airplane changes
+    if (airplane.flight) {
+      setLoadingRoute(true);
+      getAirplaneRoute(airplane.flight)
+        .then(setRoute)
+        .finally(() => setLoadingRoute(false));
+    } else {
+      setRoute(null);
+    }
+  }, [airplane.flight, airplane.hex]);
 
   return (
     <Card className="absolute left-4 top-4 w-80 max-h-[calc(100vh-2rem)] overflow-y-auto z-10 shadow-lg">
@@ -66,6 +83,43 @@ export function AirplaneCard({ airplane, onClose }: AirplaneCardProps) {
             </div>
           </div>
         </div>
+
+        {/* Flight Route */}
+        {airplane.flight && (
+          <div className="space-y-2">
+            <h3 className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
+              <MapPin className="h-4 w-4" />
+              Flight Route
+            </h3>
+            {loadingRoute ? (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Loader2 className="h-3 w-3 animate-spin" />
+                Loading route...
+              </div>
+            ) : route?.origin || route?.destination ? (
+              <div className="space-y-1 text-sm">
+                {route.origin && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">From:</span>
+                    <span className="font-medium text-right max-w-[200px] truncate" title={formatAirport(route.origin)}>
+                      {formatAirport(route.origin)}
+                    </span>
+                  </div>
+                )}
+                {route.destination && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">To:</span>
+                    <span className="font-medium text-right max-w-[200px] truncate" title={formatAirport(route.destination)}>
+                      {formatAirport(route.destination)}
+                    </span>
+                  </div>
+                )}
+              </div>
+            ) : route === null ? (
+              <p className="text-xs text-muted-foreground">Route information not available</p>
+            ) : null}
+          </div>
+        )}
 
         {/* Aircraft Type */}
         {(airplane.t || airplane.type) && (

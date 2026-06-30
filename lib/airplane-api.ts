@@ -1,5 +1,6 @@
 import useSWR from 'swr';
-import { AirplanesResponse, UserLocation } from './types';
+import { AirplanesResponse, UserLocation, Airplane, FlightRoute } from './types';
+import { fetchFlightRoute } from './route-api';
 
 const fetcher = async (url: string) => {
   const res = await fetch(url);
@@ -8,6 +9,10 @@ const fetcher = async (url: string) => {
   }
   return res.json();
 };
+
+export interface AirplaneWithRoute extends Airplane {
+  route?: FlightRoute | null;
+}
 
 export function useAirplanes(location: UserLocation | null, radius: number = 100) {
   const shouldFetch = location !== null;
@@ -33,6 +38,15 @@ export function useAirplanes(location: UserLocation | null, radius: number = 100
     isError: error,
     mutate,
   };
+}
+
+/**
+ * Fetch route information for a specific airplane
+ * Called on-demand when user clicks on an airplane
+ */
+export async function getAirplaneRoute(callsign?: string): Promise<FlightRoute | null> {
+  if (!callsign) return null;
+  return fetchFlightRoute(callsign);
 }
 
 export function getAltitudeColor(altitude?: number): string {

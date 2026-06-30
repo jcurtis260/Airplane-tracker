@@ -53,3 +53,17 @@ export interface ViewMode {
 export interface AirplaneWithHistory extends Airplane {
   history?: Array<{ lat: number; lon: number; timestamp: number }>;
 }
+
+export interface Airport {
+  icao?: string;
+  iata?: string;
+  name?: string;
+  city?: string;
+  country?: string;
+}
+
+export interface FlightRoute {
+  origin?: Airport;
+  destination?: Airport;
+  callsign?: string;
+}
